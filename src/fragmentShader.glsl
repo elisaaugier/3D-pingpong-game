@@ -55,9 +55,9 @@ void main()
     float tSph; vec3 nSph;
     bool sphHit = intersectSphere(ro, rd, sphereCenter, sphereRadius, tSph, nSph);
 
-    // Table (box)
-    vec3 tableSize = vec3(1.37, 0.02, 2.74);
-    vec3 tableCenter = vec3(0.0, -0.5, -1.13);
+    // Table (box épaisse, flottante)
+    vec3 tableSize = vec3(1.37, 0.05, 2.74); // L, H, l
+    vec3 tableCenter = vec3(0.0, -0.5, -1.13); // centre à y = -0.5 (flottante)
     vec3 tableMin = tableCenter - tableSize * 0.5;
     vec3 tableMax = tableCenter + tableSize * 0.5;
     float tTable;
@@ -130,6 +130,8 @@ void main()
     }
 
     vec3 color = baseColor;
+    float ambientStrength = 0.2; // intensité de la lumière ambiante
+    vec3 ambient = ambientStrength * baseColor;
     // Si ce n'est pas la balle, on éclaire avec la balle
     if (hitType != 0 && hitType != 5) {
         vec3 lightDir = normalize(sphereCenter - hitPos);
@@ -143,20 +145,20 @@ void main()
         bool shadowWall = intersectBox(hitPos + hitNormal * 0.001, lightDir, wallMin, wallMax, tShadowWall);
         float intensity = 0.0;
         float diffuse = 0.0;
-        // Si le point voit la balle et aucun autre objet n'est entre le point et la balle
         bool shadow = false;
         if (shadowSph && tShadowSph > 0.0 && tShadowSph < dist) {
-            // Vérifie qu'aucun autre objet n'est plus proche que la balle
             shadow = ( (!shadowTable || tShadowTable < 0.0 || tShadowTable >= dist)
                     && (!shadowNet   || tShadowNet   < 0.0 || tShadowNet   >= dist)
                     && (!shadowFloor || tShadowFloor < 0.0 || tShadowFloor >= dist)
                     && (!shadowWall  || tShadowWall  < 0.0 || tShadowWall  >= dist) );
         }
         if (shadow) {
-            intensity = 2.0 / (dist * dist); // ou autre valeur
+            intensity = 2.0 / (dist * dist);
             diffuse = max(dot(hitNormal, lightDir), 0.0);
         }
-        color = baseColor * (diffuse * intensity);
+        color = ambient + baseColor * (diffuse * intensity);
+    } else {
+        color = ambient + baseColor;
     }
     FragColor = vec4(color, 1.0);
 }
