@@ -84,6 +84,9 @@ unsigned int g_normalTexOnGPU;
 // Couleur du soleil (utilisée pour la lumière et la sphère)
 const glm::vec3 sunColor = glm::vec3(0.95, 0.95, 0.85); // presque blanc, légèrement chaud
 
+// Rayon global de la sphère (balle)
+const float g_ballRadius = 0.03f; // rayon par défaut, ajustez si besoin
+
 GLuint loadTextureFromFileToGPU(const std::string &filename)
 {
   int width, height, numComponents;
@@ -150,6 +153,8 @@ struct Scene {
   glm::mat4 tableMat = glm::mat4(1.0); // matrice de la table
   glm::mat4 netMat = glm::mat4(1.0); // matrice du filet
 
+  float netHeight = 0.1f; // Hauteur du filet
+
   glm::vec3 scene_center = glm::vec3(0);
   float scene_radius = 1.f;
 
@@ -162,7 +167,7 @@ struct Scene {
 
   void resetSim()
   {
-    *rigidAtt = Sphere(0.1f); // sphère de rayon 0.1
+    *rigidAtt = Sphere(0.03f); // sphère de rayon 0.03
     rigidAtt->X = posInit;
     solver.init(rigidAtt.get());
     rigidMat = rigidAtt->worldMat();
@@ -263,7 +268,6 @@ Scene g_scene;
 GLuint quadVAO = 0, quadVBO = 0;
 
 void initFullscreenQuad() {
-    std::cout << "> [DEBUG] Début initFullscreenQuad" << std::endl;
     float quadVertices[] = {
         // positions
         -1.0f, -1.0f,
@@ -282,7 +286,6 @@ void initFullscreenQuad() {
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    std::cout << "> [DEBUG] Fin initFullscreenQuad" << std::endl;
 }
 
 
@@ -389,14 +392,11 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 
 void initGLFW()
 {
-  std::cout << "> [DEBUG] Début initGLFW" << std::endl;
   // Initialize GLFW, the library responsible for window management
-  std::cout << "> [DEBUG] Avant glfwInit" << std::endl;
   if(!glfwInit()) {
     std::cerr << "ERROR: Failed to init GLFW" << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  std::cout << "> [DEBUG] Après glfwInit" << std::endl;
 
   // Before creating the window, set some option flags
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -404,11 +404,9 @@ void initGLFW()
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-  std::cout << "> [DEBUG] Après glfwWindowHint" << std::endl;
 
   // Create the window
   g_window = glfwCreateWindow(g_windowWidth, g_windowHeight, "A Simple Rigid Body Simulator", nullptr, nullptr);
-  std::cout << "> [DEBUG] Après glfwCreateWindow" << std::endl;
   if(!g_window) {
     std::cerr << "ERROR: Failed to open window" << std::endl;
     glfwTerminate();
@@ -417,31 +415,22 @@ void initGLFW()
 
   // Load the OpenGL context in the GLFW window using GLAD OpenGL wrangler
   glfwMakeContextCurrent(g_window);
-  std::cout << "> [DEBUG] Après glfwMakeContextCurrent" << std::endl;
 
   // not mandatory for all, but MacOS X
   glfwGetFramebufferSize(g_window, &g_windowWidth, &g_windowHeight);
-  std::cout << "> [DEBUG] Après glfwGetFramebufferSize" << std::endl;
 
   // Connect the callbacks for interactive control
   glfwSetWindowSizeCallback(g_window, windowSizeCallback);
-  std::cout << "> [DEBUG] Après glfwSetWindowSizeCallback" << std::endl;
   glfwSetKeyCallback(g_window, keyCallback);
-  std::cout << "> [DEBUG] Après glfwSetKeyCallback" << std::endl;
   glfwSetCursorPosCallback(g_window, cursorPosCallback);
-  std::cout << "> [DEBUG] Après glfwSetCursorPosCallback" << std::endl;
   glfwSetMouseButtonCallback(g_window, mouseButtonCallback);
-  std::cout << "> [DEBUG] Après glfwSetMouseButtonCallback" << std::endl;
 
   // --- Correction : initialiser la caméra avant le callback ---
   if (!g_cam) g_cam = std::make_shared<Camera>();
-  std::cout << "> [DEBUG] Après création caméra" << std::endl;
-  std::cout << "> [DEBUG] Fin initGLFW" << std::endl;
 }
 
 void initOpenGL()
 {
-  std::cout << "> [DEBUG] Début initOpenGL" << std::endl;
   // Load extensions for modern OpenGL
   if(!gladLoadGL(glfwGetProcAddress)) {
     std::cerr << "[Failed to initialize OpenGL context]" << std::endl;
@@ -467,26 +456,22 @@ void initOpenGL()
     std::cerr << "[Error loading shader program] " << e.what() << std::endl;
     std::exit(EXIT_FAILURE);
   }
-  std::cout << "> [DEBUG] Fin initOpenGL" << std::endl;
 }
 
 void initScene()
 {
-  std::cout << "> [DEBUG] Début initScene" << std::endl;
-  // Init camera
   int width, height;
   glfwGetWindowSize(g_window, &width, &height);
-  // g_cam = std::make_shared<Camera>(); // SUPPRIMÉ : la caméra est déjà créée dans initGLFW
   g_cam->setAspectRatio(static_cast<float>(width)/static_cast<float>(height));
 
   // Load meshes in the scene
   {
     g_scene.rigid = std::make_shared<Mesh>();
-    g_scene.rigid->addSphere(0.03f, 32, 32); // sphère de rayon 0.03
+    g_scene.rigid->addSphere(g_ballRadius, 32, 32); // sphère de rayon global
     g_scene.rigid->init();
 
     // for the solver
-    g_scene.rigidAtt = std::make_shared<Sphere>(0.03f); // même rayon que la géométrie
+    g_scene.rigidAtt = std::make_shared<Sphere>(g_ballRadius); // même rayon que la géométrie
     g_scene.rigidAtt->X = posInit;
     g_scene.solver.init(g_scene.rigidAtt.get());
 
@@ -503,12 +488,11 @@ void initScene()
     g_scene.table->init();
     g_scene.tableMat = glm::translate(glm::mat4(1.0), glm::vec3(0, -0.5f, -1.13f)); // aligné avec le mur au fond
 
-    // filet : dimensions typiques (épaisseur 1cm, hauteur 15cm, longueur table)
+    // filet : dimensions typiques (épaisseur 1cm, hauteur 10cm, longueur table)
     g_scene.net = std::make_shared<Mesh>();
-    g_scene.net->addBox(1.37f, 0.15f, 0.01f); // L, H, épaisseur
+    g_scene.net->addBox(1.37f, g_scene.netHeight, 0.01f); // L, H, épaisseur
     g_scene.net->init();
-    // Positionné au centre de la table (y = dessus table + moitié hauteur filet, z = centre table)
-    g_scene.netMat = glm::translate(glm::mat4(1.0), glm::vec3(0, -0.5f + 0.02f/2 + 0.15f/2, -1.13f))
+    g_scene.netMat = glm::translate(glm::mat4(1.0), glm::vec3(0, -0.5f + 0.02f/2 + g_scene.netHeight/2, -1.13f))
       * glm::translate(glm::mat4(1.0), glm::vec3(0, 0, 2.74f/2 - 2.74f/2));
   }
 
@@ -540,7 +524,7 @@ void initScene()
   // Adjust the camera to the mesh
   g_meshScale = g_scene.scene_radius;
   glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z); // balle
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.5, 1.0);
+  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.5, 10.0);
   g_cam->setPosition(camPos);
   // Calcul de la rotation pour regarder vers la cible
   glm::vec3 dir = glm::normalize(camTarget - camPos);
@@ -551,7 +535,6 @@ void initScene()
   g_cam->setFar(6.0*g_meshScale);
 
   g_scene.rigidMat = g_scene.rigidAtt->worldMat();
-  std::cout << "> [DEBUG] Fin initScene" << std::endl;
 }
 
 void init()
@@ -609,9 +592,14 @@ void render()
     g_scene.mainShader->set("camPos", g_cam->getPosition());
     g_scene.mainShader->set("viewMat", g_cam->computeViewMatrix());
     g_scene.mainShader->set("projMat", g_cam->computeProjectionMatrix());
+    g_scene.mainShader->set("fov", g_cam->getFov());
+    g_scene.mainShader->set("aspect", g_cam->getAspectRatio());
     // Envoi de la position de la balle au shader ray tracing
     g_scene.mainShader->set("sphereCenter", glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z));
-    g_scene.mainShader->set("sphereRadius", static_cast<Sphere*>(g_scene.rigidAtt.get())->radius);
+    // Envoi de la hauteur du filet au shader ray tracing
+    g_scene.mainShader->set("netHeight", g_scene.netHeight);
+    // Envoi du rayon de la sphère au shader ray tracing
+    g_scene.mainShader->set("sphereRadius", g_ballRadius);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
@@ -624,54 +612,27 @@ void render()
 void update(const float currentTime)
 {
   if(!g_appTimerStoppedP) {
-    // Animate any entity of the program here
     const float dt = currentTime - g_appTimerLastClockTime;
     g_appTimerLastClockTime = currentTime;
     g_appTimer += dt;
-    // <---- Update here what needs to be animated over time ---->
-
-    g_scene.solver.step(std::min(dt, 0.017f)); // solve for the next step; avoid any chances of too large time step
-    g_scene.rigidMat = g_scene.rigidAtt->worldMat(); // update position/orientation for rendering
+    g_scene.solver.step(std::min(dt, 0.017f));
+    g_scene.rigidMat = g_scene.rigidAtt->worldMat();
   }
-  // Mise à jour de la position de la lumière pour suivre la balle
   g_scene.light.position = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
-
-  // --- Forcer la caméra à regarder la balle à chaque frame ---
   glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.0, 2.0); // éloigné à Z=2.0
+  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.5, 3.0);
   g_cam->setPosition(camPos);
   glm::vec3 dir = glm::normalize(camTarget - camPos);
   float yaw = atan2(dir.x, -dir.z);
   float pitch = asin(dir.y);
   g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
-  // Augmente temporairement le rayon de la sphère
-  static_cast<Sphere*>(g_scene.rigidAtt.get())->radius = 0.5f;
-
-  // DEBUG : Affichage position balle et caméra
-  std::cout << "> [DEBUG] Balle: (" << camTarget.x << ", " << camTarget.y << ", " << camTarget.z << ")  Caméra: (" << camPos.x << ", " << camPos.y << ", " << camPos.z << ")" << std::endl;
-
-  // DEBUG : Affichage matrices vue et projection
-  glm::mat4 viewMat = g_cam->computeViewMatrix();
-  glm::mat4 projMat = g_cam->computeProjectionMatrix();
-  std::cout << "> [DEBUG] ViewMatrix :\n";
-  for(int i=0; i<4; ++i) {
-    std::cout << "   ";
-    for(int j=0; j<4; ++j) std::cout << std::setw(10) << viewMat[j][i] << " ";
-    std::cout << std::endl;
-  }
-  std::cout << "> [DEBUG] ProjMatrix :\n";
-  for(int i=0; i<4; ++i) {
-    std::cout << "   ";
-    for(int j=0; j<4; ++j) std::cout << std::setw(10) << projMat[j][i] << " ";
-    std::cout << std::endl;
-  }
+  // Rayon sphère visible
+  static_cast<Sphere*>(g_scene.rigidAtt.get())->radius = g_ballRadius;
 }
 
 int main(int argc, char **argv)
 {
-  std::cout << "> [DEBUG] Début main" << std::endl;
   init();
-  std::cout << "> [DEBUG] Après init()" << std::endl;
   while(!glfwWindowShouldClose(g_window)) {
     update(static_cast<float>(glfwGetTime()));
     render();
@@ -679,6 +640,5 @@ int main(int argc, char **argv)
     glfwPollEvents();
   }
   clear();
-  std::cout << " > Quit" << std::endl;
   return EXIT_SUCCESS;
 }
