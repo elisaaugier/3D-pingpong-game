@@ -24,9 +24,38 @@
 #include "Vector3.hpp"
 #include "Matrix3x3.hpp"
 
-Vec3f posInit(0, 0, 0);
 
-// Simple quaternion (w + xi + yj + zk)
+extern const tReal sphereRadius = 0.04f;
+extern const tReal tableHeight = 0.15f; // épaisseur visible de la table
+extern const tReal tableYmax = -0.5f ; // y du dessus de la table
+extern const tReal tableYmin = tableYmax-tableHeight;
+extern const tReal tableZmin = -1.13f - 3.5f/2.0f;
+extern const tReal tableZmax = -1.13f + 3.5f/2.0f;
+extern const tReal tableXmin = -2.0f;
+extern const tReal tableXmax = 2.0f;
+extern const tReal wallHeight = 0.20f;
+extern const tReal wallWidth = 0.06f;  //épaisseur du mur du fond
+extern const tReal wallLength = 0.2f;
+extern const tReal wallYmin = tableYmin - 0.5f;
+extern const tReal wallYmax = tableYmax + 1.5f;
+extern const tReal wallXmin = -2.5f;
+extern const tReal wallXmax = wallXmin+wallLength;
+extern const tReal wallZmax = tableZmin - 0.2f;
+extern const tReal wallZmin = wallZmax - wallWidth;
+extern const tReal netWidth = tableXmax - tableXmin;
+extern const tReal netHeight = 0.15f;
+extern const tReal netThickness = 0.01f;
+extern const tReal netY = -0.5f + 0.02f/2 + 0.15f/2; // même Y que le mesh
+extern const tReal netZ = -1.13f;
+
+Vec3f posInit((tableXmin + tableXmax)/2, tableYmax + 0.5f, tableZmax);
+tReal speed = 5.0f;
+
+tReal g = 9.81f;
+tReal restitution = 0.561f;
+
+
+// Quaternion (w + xi + yj + zk)
 struct Quaternion {
   tReal w, x, y, z;
   Quaternion(): w(1), x(0), y(0), z(0) {}
@@ -104,10 +133,10 @@ struct BodyAttributes {
 
 class Sphere : public BodyAttributes {
 public:
-  explicit Sphere(const tReal r=0.1, const tReal dens=2.7, const Vec3f v0=Vec3f(0,0,0)) : radius(r) {
+  explicit Sphere(const tReal r=0.1, const tReal dens=11.2f, const Vec3f v0=Vec3f(0,0,0)) : radius(r) {
     V = v0;
     // Masse et inertie pour une sphère pleine
-    M = dens * (4.0/3.0) * M_PI * radius * radius * radius;
+    M = 0.003f;
     tReal I = (2.0/5.0) * M * radius * radius;
     I0 = Mat3f(I,0,0, 0,I,0, 0,0,I);
     I0inv = I0.inverse();
@@ -116,7 +145,249 @@ public:
     vdata0.push_back(Vec3f(0,0,0));
   }
   tReal radius;
+  // Intersection segment-sphère (renvoie true si le segment [orig, end] traverse la sphère)
+  bool intersectSegment(const glm::vec3& orig, const glm::vec3& end) const {
+    glm::vec3 center(X.x, X.y, X.z);
+    glm::vec3 d = end - orig;
+    glm::vec3 oc = orig - center;
+    float a = glm::dot(d, d);
+    float b = 2.0f * glm::dot(oc, d);
+    float c = glm::dot(oc, oc) - radius * radius;
+    float disc = b * b - 4 * a * c;
+    if (disc < 0) return false;
+    float sqrtDisc = sqrt(disc);
+    float t1 = (-b - sqrtDisc) / (2.0f * a);
+    float t2 = (-b + sqrtDisc) / (2.0f * a);
+    // Intersection si t dans [0,1]
+    return (t1 >= 0.0f && t1 <= 1.0f) || (t2 >= 0.0f && t2 <= 1.0f);
+  }
+  // Détecte la collision avec un plan (point sur le plan et normale)
+  // Retourne true si collision, et remplit penetration et normalContact
+  bool checkPlaneCollision(const Vector3<tReal>& planePoint, const Vector3<tReal>& planeNormal, tReal& penetration, Vector3<tReal>& normalContact) const {
+      Vector3<tReal> center(X.x, X.y, X.z);
+      tReal dist = (center - planePoint).dotProduct(planeNormal);
+      if (dist < radius) {
+          penetration = radius - dist;
+          normalContact = planeNormal;
+          return true;
+      }
+      return false;
+  }
+
+  // Calcule la vitesse initiale V0 pour aller de A à B en passant par dessus le filet
+  // g doit être positif (ex: 9.81)
+
+  static Vector3<float> computeShotWithNetShortestTime(
+    const Vector3<float>& A,
+    const Vector3<float>& B)
+{
+    auto heightAtNet = [&](float T)
+    {
+        Vector3<float> v0 = (B - A) / T;
+        v0.y += 0.5f * g * T;
+
+        if (fabs(v0.z) < 1e-6f)
+            return -1e6f;
+
+        float tNet = (netZ - A.z) / v0.z;
+
+        if (tNet <= 0.0f || tNet >= T)
+            return -1e6f;
+
+        float yAtNet =
+            A.y + v0.y * tNet
+            - 0.5f * g * tNet * tNet;
+
+        return yAtNet;
+    };
+
+    float Tmin = 0.05f;
+    float Tmax = 2.0f;
+
+    for (int i = 0; i < 40; i++)
+    {
+        float Tmid = 0.5f * (Tmin + Tmax);
+
+        if (heightAtNet(Tmid) > netY + 10*sphereRadius)
+            Tmax = Tmid;
+        else
+            Tmin = Tmid;
+    }
+
+    float Tfinal = Tmax;
+
+    Vector3<float> v0 = (B - A) / Tfinal;
+    v0.y += 0.5f * g * Tfinal;
+
+    return v0;
+}
+
+
+
+  static Vector3<float> computeMinimalShotWithNet(const Vector3<float>& A,const Vector3<float>& B)
+  {
+    const float eps = 1e-6f;
+    const float step = 0.001f;     // incrément vitesse pour recherche
+    const float maxFactor = 3.0f;  // limite de vitesse
+
+    Vector3<float> d = B - A;
+    float dxz = std::sqrt(d.x*d.x + d.z*d.z);
+    float dy  = d.y;
+
+    if (dxz < eps) return Vector3<float>(0,0,0);
+
+    // vitesse minimale théorique sans filet (solution basse)
+    float vMin0 = std::sqrt(g*dxz*dxz / (2.0f*(dxz * 0.0f - dy + eps))); 
+    // 0.0f pour tanTheta minimale → solution basse
+    // ajoute eps pour éviter div par 0
+
+    float v = vMin0;
+
+    while (v < vMin0 * maxFactor)
+    {
+        float v2 = v*v;
+        float v4 = v2*v2;
+        float disc = v4 - g*(g*dxz*dxz + 2.0f*dy*v2);
+
+        if (disc >= 0.0f)
+        {
+            float sqrtDisc = std::sqrt(disc);
+
+            // ---- solution basse (tir le plus plat) ----
+            float tanTheta = (v2 - sqrtDisc) / (g * dxz);
+
+            float cosTheta = 1.0f / std::sqrt(1.0f + tanTheta*tanTheta);
+            float sinTheta = tanTheta * cosTheta;
+
+            Vector3<float> dirXZ(d.x, 0, d.z);
+            dirXZ.normalize();
+
+            Vector3<float> v0;
+            v0.x = v * cosTheta * dirXZ.x;
+            v0.z = v * cosTheta * dirXZ.z;
+            v0.y = v * sinTheta;
+
+            // ---- TEST PASSAGE FILET ----
+            if (std::abs(v0.z) > eps)
+            {
+                float tNet = (netZ - A.z) / v0.z;
+                if (tNet > 0.0f)
+                {
+                    float yAtNet = A.y + v0.y * tNet - 0.5f * g * tNet * tNet;
+
+                    if (yAtNet > netY+4*sphereRadius)
+                    {
+                        // vitesse minimale réalisable
+                        return v0;
+                    }
+                }
+            }
+        }
+
+        v += step;  // augmente vitesse si filet non franchi
+    }
+
+    // fallback si aucune solution trouvée
+    return Vector3<float>(0,0,0);
+  }
+
+  static Vector3<float> computeR1FromR2(
+      const Vector3<float>& A,
+      const Vector3<float>& R2,
+      float zR1)
+  {
+      float dz = R2.z - A.z;
+
+      if (fabs(dz) < 1e-6f)
+          return A; // cas dégénéré
+
+      float t = (zR1 - A.z) / dz;
+      Vector3<tReal> R1;
+      R1.x = A.x + t * (R2.x - A.x);
+      R1.y = R2.y;
+      R1.z = zR1;
+
+      return R1;
+  }
+
+  static Vector3<tReal> computeService(const Vector3<tReal>& A, const Vector3<tReal>& R2)
+  {
+    // R1 dans la diagonale entre A et R2
+    tReal zR1 = netZ + (tableZmax-tableZmin) * 0.25f;
+
+    Vector3<tReal> R1 = computeR1FromR2(A, R2, zR1);
+    float dz = R2.z - A.z;
+    if (fabs(dz) < 1e-6f)
+    {
+        return Vector3<float>(0,0,0);
+    }
+
+    float tLine = (zR1 - A.z) / dz;
+
+    // Recherche du bon T1 qui permet d'arriver jusqu'en R2 après rebond en R1
+    float Tmin = 0.05f;
+    float Tmax = 2.0f;
+
+    Vector3<float> bestV0;
+
+    for(int i = 0; i < 60; ++i)
+    {
+        float T1 = 0.5f * (Tmin + Tmax);
+
+        // vitesse pour atteindre R1
+        Vector3<float> v0;
+        v0.x = (R1.x - A.x) / T1;
+        v0.z = (R1.z - A.z) / T1;
+        v0.y = (R1.y - A.y + 0.5f * g * T1 * T1) / T1;
+
+
+        // vitesse après rebond
+        Vector3<float> v1 = v0;
+        v1.y = -restitution * v0.y;
+
+        // temps vers second impact (résolution verticale)
+        float a = -0.5f * g;
+        float b = v1.y;
+        float c = R1.y - R2.y;
+
+        float delta = b*b - 4*a*c;
+        if(delta <= 0)
+        {
+            Tmin = T1;
+            continue;
+        }
+
+        float T2 = (-b - sqrt(delta)) / (2*a);
+        if(T2 <= 0)
+        {
+            Tmin = T1;
+            continue;
+        }
+
+        // position du second impact
+        Vector3<float> P2 = R1 + v1 * T2;
+        P2.y -= 0.5f * g * T2 * T2;
+
+        float errorZ = P2.z - R2.z;
+
+        if (fabs(errorZ) < 1e-4f)
+        {
+            bestV0 = v0;
+            break;
+        }
+
+        if(errorZ > 0)
+            Tmin = T1;
+        else
+            Tmax = T1;
+
+        bestV0 = v0;
+    }
+    return bestV0;
+  }
+
 };
+
 
 
 class Box : public BodyAttributes {
@@ -145,7 +416,6 @@ public:
     vdata0.push_back(Vec3f( 0.5*w, -0.5*h, -0.5*d));
     vdata0.push_back(Vec3f( 0.5*w,  0.5*h, -0.5*d));
     vdata0.push_back(Vec3f(-0.5*w,  0.5*h, -0.5*d));
-
     vdata0.push_back(Vec3f(-0.5*w, -0.5*h,  0.5*d));
     vdata0.push_back(Vec3f( 0.5*w, -0.5*h,  0.5*d));
     vdata0.push_back(Vec3f( 0.5*w,  0.5*h,  0.5*d));
@@ -154,13 +424,57 @@ public:
 
   // rigid body property
   tReal width, height, depth;
+  // Intersection rayon-AABB (renvoie true si intersection)
+  // Ajout d'un paramètre minDist pour ignorer les auto-intersections proches
+  bool intersectRay(const glm::vec3& rayOrig, const glm::vec3& rayDir, float minDist = 1e-2f) const {
+    glm::vec3 boxMin(X.x - 0.5f*width, X.y - 0.5f*height, X.z - 0.5f*depth);
+    glm::vec3 boxMax(X.x + 0.5f*width, X.y + 0.5f*height, X.z + 0.5f*depth);
+    float tNear = -1e30f, tFar = 1e30f;
+    for (int i = 0; i < 3; ++i) {
+      if (fabs(rayDir[i]) < 1e-6) {
+        if (rayOrig[i] < boxMin[i] || rayOrig[i] > boxMax[i]) return false;
+      } else {
+        float t1 = (boxMin[i] - rayOrig[i]) / rayDir[i];
+        float t2 = (boxMax[i] - rayOrig[i]) / rayDir[i];
+        if (t1 > t2) std::swap(t1, t2);
+        tNear = std::max(tNear, t1);
+        tFar = std::min(tFar, t2);
+        if (tNear > tFar) return false;
+      }
+    }
+    // On ne considère l'intersection que si tNear > minDist
+    return tFar > 0.0f && tNear > minDist;
+  }
+  // Intersection segment-AABB (renvoie true si le segment [orig, end] traverse la box)
+  bool intersectSegment(const glm::vec3& orig, const glm::vec3& end) const {
+    glm::vec3 boxMin(X.x - 0.5f*width, X.y - 0.5f*height, X.z - 0.5f*depth);
+    glm::vec3 boxMax(X.x + 0.5f*width, X.y + 0.5f*height, X.z + 0.5f*depth);
+    glm::vec3 d = end - orig;
+    float tNear = 0.0f, tFar = 1.0f;
+    for (int i = 0; i < 3; ++i) {
+      if (fabs(d[i]) < 1e-6) {
+        if (orig[i] < boxMin[i] || orig[i] > boxMax[i]) return false;
+      } else {
+        float t1 = (boxMin[i] - orig[i]) / d[i];
+        float t2 = (boxMax[i] - orig[i]) / d[i];
+        if (t1 > t2) std::swap(t1, t2);
+        tNear = std::max(tNear, t1);
+        tFar = std::min(tFar, t2);
+        if (tNear > tFar) return false;
+      }
+    }
+    return tFar >= 0.0f && tNear <= 1.0f && tNear <= tFar;
+  }
 };
 
 class RigidSolver {
 public:
   explicit RigidSolver(
     BodyAttributes *body0=nullptr, const Vec3f g=Vec3f(0, 0, 0)) :
-    body(body0), _g(g), _step(0), _sim_t(0) {}
+    body(body0), _g(g), _step(0), _sim_t(0), gameOver(false), lastWallTouched(0) {}
+
+  bool gameOver = false;       // true si la balle a touché le sol
+  int lastWallTouched = 0;     // 0 = none 1 = mur du fond, 2 = mur de devant
 
   void init(BodyAttributes *body0)
   {
@@ -219,61 +533,120 @@ private:
   void computeForceAndTorque()
   {
     if(!body) return;
+    if (gameOver) {
+      body->F = Vec3f(0,0,0);
+      body->V = Vec3f(0,0,0);
+      body->P = Vec3f(0,0,0);
+      return;
+    }
 
     // gravity
     body->F = body->M * _g;
-
     // reset torque
     body->tau = Vec3f(0,0,0);
 
-    // Ground contact detection and collision impulse
-    const tReal groundY = -1.0f;
-    const tReal groundSize = 1.1f; // demi-taille du sol (zone colorée)
-    tReal maxPenetration = 0.0f;
-    // Correction : tester le point le plus bas de la sphère
-    tReal bottomY = body->X.y - static_cast<const Sphere*>(body)->radius;
-    // --- Rebond sur le sol ---
-    if(bottomY < groundY) {
-      tReal penetration = groundY - bottomY;
-      if(penetration > maxPenetration) maxPenetration = penetration;
-      // Faire rebondir la balle avec un coefficient de restitution
-      const float restitution = 1.f; // 0 = pas de rebond, 1 = rebond parfait
+    // --- Collision planaires unifiées ---
+    tReal penetration;
+    Vector3<tReal> normalContact;
+    tReal restitution = 1.0f; // 1= rebond parfait
+    const Sphere* sphere = static_cast<const Sphere*>(body);
+
+    // Sol (y = -1)
+    if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->V.y < 0) {
-        body->V.y *= -restitution;
-        body->P.y = body->V.y * body->M; // synchroniser l'impulsion
+        gameOver = true;
+        body->V = Vec3f(0,0,0);
+        body->P = body->V * body->M;
+        body->F = Vec3f(0,0,0);
+        body->tau = Vec3f(0,0,0);
+        body->X.y = -1.0f + sphere->radius;
       }
     }
-    // --- Rebond sur la table ---
-    const tReal tableY = -0.5f + 0.02f/2.0f; // y du dessus de la table
-    const tReal tableZmin = -1.13f - 2.74f/2.0f;
-    const tReal tableZmax = -1.13f + 2.74f/2.0f;
-    const tReal tableXmin = -1.37f/2.0f;
-    const tReal tableXmax = 1.37f/2.0f;
-    // Si la balle est au-dessus de la table (en x/z) et touche le dessus
-    if(body->X.x > tableXmin && body->X.x < tableXmax &&
-       body->X.z > tableZmin && body->X.z < tableZmax &&
-       bottomY < tableY && body->X.y > groundY + 0.05f) // éviter double rebond sol/table
-    {
-      tReal penetration = tableY - bottomY;
-      if(penetration > maxPenetration) maxPenetration = penetration;
-      const float restitution = 1.f;
+    /*if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->V.y < 0) {
-        body->V.y *= -restitution;
-        body->P.y = body->V.y * body->M;
+        body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
+        body->P = body->V * body->M;
+        body->X.y = -1.0f + sphere->radius;
+      }
+    }*/ 
+    // Table (dessus)
+    if(sphere->checkPlaneCollision(Vector3<tReal>(0, tableYmax, 0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
+      if(body->X.x > tableXmin && body->X.x < tableXmax && body->X.z > tableZmin && body->X.z < tableZmax && body->X.y > tableYmin) {
+        if(body->V.y < 0) {
+          body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
+          body->P = body->V * body->M;
+          body->X.y = tableYmax + sphere->radius;
+        }
       }
     }
-    // Correction de position unique (max penetration)
-    if(maxPenetration > 0) {
-      body->X.y += maxPenetration;
+    // Mur (arrière, plan z = tableZmin - 0.2)
+    // On centre dynamiquement le mur sur la balle (comme dans le raytracer)
+    tReal wallX = body->X.x;
+    tReal wallY = body->X.y;
+    tReal wallInfX = wallX - wallLength/2;
+    tReal wallMajX = wallX + wallLength/2;
+    tReal wallInfY = wallY - wallHeight/2;
+    tReal wallMajY = wallY + wallHeight/2;
+    if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
+      if(body->X.x > wallInfX && body->X.x < wallMajX && body->X.y > wallInfY && body->X.y < wallMajY) {
+        if(body->V.z < 0) {
+          Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
+          // Calcul direction balistique pour atteindre la cible
+          tReal filetZ = netZ;
+          tReal fondZ = tableZmax;
+          tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+          tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
+          Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
+          Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
+          body->V = V0;
+          body->P = body->V * body->M;
+          body->X.z = tableZmin - 0.2f + sphere->radius;
+          lastWallTouched = 1; // mur du fond
+        }
+      }
+    }
+
+    // rebond devant raquette (plan z = tableZmax + 0.2)
+    if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,tableZmax + 0.2f), Vector3<tReal>(0,0,-1), penetration, normalContact)) {
+      // Limites identiques au mur visuel
+      tReal minX = tableXmin - 0.2f;
+      tReal maxX = tableXmax + 0.2f;
+      tReal minY = tableYmin - 0.1f;
+      tReal maxY = tableYmax + 2.0f;
+      if(body->X.x > minX && body->X.x < maxX && body->X.y > minY && body->X.y < maxY) {
+        if(body->V.z > 0) {
+          Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
+          // Calcul direction balistique pour atteindre la cible
+          tReal filetZ = netZ;
+          tReal fondZ = tableZmin;
+          tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+          tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
+          Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
+          Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
+          body->V = V0;
+          body->P = body->V * body->M;
+          lastWallTouched = 2; // mur de devant
+        }
+      }
     }
 
     // instantaneous external force on the 0th vertex at step 1
     if(_step==1 && !body->vdata0.empty()) {
-      const Vec3f instF(0.0f, 0.0f, 0.0f);
-      // application point in world coordinates (relative to center): R * v0
-      const Vec3f r_world = body->R * body->vdata0[0];
-      body->F += instF;                  // add to resultant force
-      body->tau += r_world.crossProduct(instF); // add torque = r x F
+      // Point de départ (A) : position actuelle de la balle
+      Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
+      // Point d'arrivée (B)
+      tReal filetZ = netZ;
+      tReal fondZ = tableZmin;
+      tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+      tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
+      Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
+      Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
+      //Vector3<tReal> V0 = Sphere::computeService(A,B);
+      body->V = V0;
+      body->P = body->V * body->M;
+      // Optionnel : afficher la vitesse calculée pour debug
+      std::cout << "V0 = (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
+
     }
   } 
   // simulation parameters

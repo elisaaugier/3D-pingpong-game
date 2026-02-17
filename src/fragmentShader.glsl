@@ -11,7 +11,13 @@ uniform vec3 sphereCenter;
 uniform float sphereRadius;
 uniform float fov;
 uniform float aspect;
-uniform float netHeight;
+
+// Uniforms for min/max variables
+uniform float tableXmin, tableXmax, tableYmin, tableYmax, tableZmin, tableZmax;
+uniform float wallXmin, wallXmax, wallYmin, wallYmax, wallZmin, wallZmax;
+uniform float netWidth, netHeight, netThickness;
+// Floor min/max bounds
+uniform float floorXmin, floorXmax, floorYmin, floorYmax, floorZmin, floorZmax;
 
 // Ray-sphere intersection
 bool intersectSphere(vec3 ro, vec3 rd, vec3 center, float radius, out float t, out vec3 n) {
@@ -56,34 +62,26 @@ void main()
     bool sphHit = intersectSphere(ro, rd, sphereCenter, sphereRadius, tSph, nSph);
 
     // Table (box épaisse, flottante)
-    vec3 tableSize = vec3(1.37, 0.05, 2.74); // L, H, l
-    vec3 tableCenter = vec3(0.0, -0.5, -1.13); // centre à y = -0.5 (flottante)
-    vec3 tableMin = tableCenter - tableSize * 0.5;
-    vec3 tableMax = tableCenter + tableSize * 0.5;
+    vec3 tableMin = vec3(tableXmin, tableYmin, tableZmin);
+    vec3 tableMax = vec3(tableXmax, tableYmax, tableZmax);
     float tTable;
     bool tableHit = intersectBox(ro, rd, tableMin, tableMax, tTable);
 
     // Filet (box)
-    vec3 netSize = vec3(1.37, netHeight, 0.01);
-    vec3 netCenter = vec3(0.0, -0.5 + 0.02/2.0 + netHeight/2.0, -1.13);
-    vec3 netMin = netCenter - netSize * 0.5;
-    vec3 netMax = netCenter + netSize * 0.5;
+    vec3 netMin = vec3(tableXmin, tableYmax, (tableZmax+tableZmin)/2-0.5*netThickness);
+    vec3 netMax = vec3(tableXmax, tableYmax+netHeight, (tableZmax+tableZmin)/2+0.5*netThickness);
     float tNet;
     bool netHit = intersectBox(ro, rd, netMin, netMax, tNet);
 
     // Sol (box plate sous la table, dimensions visuelles proches du main.cpp)
-    vec3 floorSize = vec3(4.0, 0.02, 4.0);
-    vec3 floorCenter = vec3(0.0, -1.0, 0.0);
-    vec3 floorMin = floorCenter - floorSize * 0.5;
-    vec3 floorMax = floorCenter + floorSize * 0.5;
+    vec3 floorMin = vec3(floorXmin, floorYmin, floorZmin);
+    vec3 floorMax = vec3(floorXmax, floorYmax, floorZmax);
     float tFloor;
     bool floorHit = intersectBox(ro, rd, floorMin, floorMax, tFloor);
 
     // Mur du fond (box verticale derrière la table)
-    vec3 wallSize = vec3(4.0, 2.0, 0.02);
-    vec3 wallCenter = vec3(0.0, 0.0, -2.5);
-    vec3 wallMin = wallCenter - wallSize * 0.5;
-    vec3 wallMax = wallCenter + wallSize * 0.5;
+    vec3 wallMin = vec3(wallXmin, wallYmin, wallZmin);
+    vec3 wallMax = vec3(wallXmax, wallYmax, wallZmax);
     float tWall;
     bool wallHit = intersectBox(ro, rd, wallMin, wallMax, tWall);
 

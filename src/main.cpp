@@ -167,9 +167,19 @@ struct Scene {
 
   void resetSim()
   {
-    *rigidAtt = Sphere(0.03f); // sphère de rayon 0.03
+    *rigidAtt = Sphere(0.6f); // sphère de rayon 0.6
     rigidAtt->X = posInit;
+    rigidAtt->V = Vec3f(0,0,0);
+    rigidAtt->P = Vec3f(0,0,0);
+    rigidAtt->omega = Vec3f(0,0,0);
+    rigidAtt->L = Vec3f(0,0,0);
+    rigidAtt->F = Vec3f(0,0,0);
+    rigidAtt->q = Quaternion::identity();
+    rigidAtt->R = rigidAtt->q.toMatrix();
+    rigidAtt->Iinv = rigidAtt->R * rigidAtt->I0inv * rigidAtt->R.transposed();
     solver.init(rigidAtt.get());
+    solver.gameOver = false;
+    solver.lastWallTouched = 0;
     rigidMat = rigidAtt->worldMat();
   }
 
@@ -479,7 +489,8 @@ void initScene()
     g_scene.plane->addPlane();
     g_scene.plane->init();
     g_scene.planeMat = glm::translate(glm::mat4(1.0), glm::vec3(0, 0, -2.5f)); // mur arrière
-    g_scene.floorMat = glm::scale(glm::mat4(1.0), glm::vec3(4.0f, 1.0f, 4.0f)) *
+    // Agrandir le sol ici (par exemple 10x plus grand)
+    g_scene.floorMat = glm::scale(glm::mat4(1.0), glm::vec3(40.0f, 1.0f, 40.0f)) *
       glm::translate(glm::mat4(1.0), glm::vec3(0, -1.0, 0)) *
       glm::rotate(glm::mat4(1.0), (float)(-0.5f*M_PI), glm::vec3(1.0, 0.0, 0.0));
 
@@ -524,7 +535,7 @@ void initScene()
   // Adjust the camera to the mesh
   g_meshScale = g_scene.scene_radius;
   glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z); // balle
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.5, 10.0);
+  glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 10.0);
   g_cam->setPosition(camPos);
   // Calcul de la rotation pour regarder vers la cible
   glm::vec3 dir = glm::normalize(camTarget - camPos);
@@ -591,6 +602,45 @@ void render()
     g_scene.mainShader->set("netHeight", g_scene.netHeight);
     // Envoi du rayon de la sphère au shader ray tracing
     g_scene.mainShader->set("sphereRadius", g_ballRadius);
+    // Envoi des uniforms pour la scène raytracée
+    g_scene.mainShader->set("tableXmin", tableXmin);
+    g_scene.mainShader->set("tableXmax", tableXmax);
+    g_scene.mainShader->set("tableYmin", tableYmin);
+    g_scene.mainShader->set("tableYmax", tableYmax);
+    g_scene.mainShader->set("tableZmin", tableZmin);
+    g_scene.mainShader->set("tableZmax", tableZmax);
+    g_scene.mainShader->set("netWidth", netWidth);
+    g_scene.mainShader->set("netHeight", netHeight);
+    g_scene.mainShader->set("netThickness", netThickness);
+    // Uniforms pour le sol raytracé
+    float floorXmin = tableXmin - 5.0f;
+    float floorXmax = tableXmax + 5.0f;
+    float floorYmin = -1.0f;
+    float floorYmax = -1.0f; // strictement plat
+    float floorZmin = tableZmin - 5.0f;
+    float floorZmax = tableZmax + 5.0f;
+    g_scene.mainShader->set("floorXmin", floorXmin);
+    g_scene.mainShader->set("floorXmax", floorXmax);
+    g_scene.mainShader->set("floorYmin", floorYmin);
+    g_scene.mainShader->set("floorYmax", floorYmax);
+    g_scene.mainShader->set("floorZmin", floorZmin);
+    g_scene.mainShader->set("floorZmax", floorZmax);
+    // Correction dynamique de la hauteur ET de la position X du mur du fond (mur centré sur la balle)
+    float wallXcenter = g_scene.rigidAtt->X.x;
+    float wallHalfLength = (wallLength) * 0.5f;
+    float wallXmin_dyn = wallXcenter - wallHalfLength;
+    float wallXmax_dyn = wallXcenter + wallHalfLength;
+    g_scene.mainShader->set("wallXmin", wallXmin_dyn);
+    g_scene.mainShader->set("wallXmax", wallXmax_dyn);
+    // Hauteur dynamique (déjà présent)
+    float wallYcenter = g_scene.rigidAtt->X.y;
+    float wallHalfHeight = (wallHeight) * 0.5f;
+    float wallYmin_dyn = wallYcenter - wallHalfHeight;
+    float wallYmax_dyn = wallYcenter + wallHalfHeight;
+    g_scene.mainShader->set("wallYmin", wallYmin_dyn);
+    g_scene.mainShader->set("wallYmax", wallYmax_dyn);
+    g_scene.mainShader->set("wallZmin", wallZmin);
+    g_scene.mainShader->set("wallZmax", wallZmax);
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
@@ -611,7 +661,7 @@ void update(const float currentTime)
   }
   g_scene.light.position = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
   glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 0.5, 3.0);
+  glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 5.0);
   g_cam->setPosition(camPos);
   glm::vec3 dir = glm::normalize(camTarget - camPos);
   float yaw = atan2(dir.x, -dir.z);
