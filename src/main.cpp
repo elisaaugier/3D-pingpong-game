@@ -548,33 +548,24 @@ void init()
 
 void clear()
 {
-  std::cout << "> [DEBUG] clear: g_cam.reset()" << std::endl;
   g_cam.reset();
-  std::cout << "> [DEBUG] clear: g_scene.rigid.reset()" << std::endl;
   g_scene.rigid.reset();
-  std::cout << "> [DEBUG] clear: g_scene.plane.reset()" << std::endl;
   g_scene.plane.reset();
-  std::cout << "> [DEBUG] clear: g_scene.mainShader.reset()" << std::endl;
   g_scene.mainShader.reset();
   // Libération des VAO/VBO du quad plein écran
-  std::cout << "> [DEBUG] clear: glDeleteVertexArrays/glDeleteBuffers" << std::endl;
   if (quadVAO) glDeleteVertexArrays(1, &quadVAO);
   if (quadVBO) glDeleteBuffers(1, &quadVBO);
   // Libération explicite des textures
-  std::cout << "> [DEBUG] clear: glDeleteTextures" << std::endl;
   if (g_albedoTex) glDeleteTextures(1, &g_albedoTex);
   if (g_normalTex) glDeleteTextures(1, &g_normalTex);
   // Désactivation des callbacks GLFW
-  std::cout << "> [DEBUG] clear: désactivation callbacks GLFW" << std::endl;
   if (g_window) {
     glfwSetWindowSizeCallback(g_window, nullptr);
     glfwSetKeyCallback(g_window, nullptr);
     glfwSetCursorPosCallback(g_window, nullptr);
     glfwSetMouseButtonCallback(g_window, nullptr);
   }
-  std::cout << "> [DEBUG] clear: glfwDestroyWindow" << std::endl;
   glfwDestroyWindow(g_window);
-  std::cout << "> [DEBUG] clear: glfwTerminate" << std::endl;
   glfwTerminate();
   std::exit(EXIT_SUCCESS); // Contournement pour éviter le segfault à la fermeture
 }

@@ -89,26 +89,74 @@ void main()
 
     // On cherche l'objet le plus proche
     float tMin = 1e20;
-    vec3 color = vec3(0.1, 0.1, 0.15); // fond sombre
+    int hitType = 0;
+    vec3 hitNormal = vec3(0);
+    vec3 hitPos = vec3(0);
+    vec3 baseColor = vec3(0.03, 0.03, 0.05); // fond sombre réduit
     if (floorHit && tFloor > 0.0 && tFloor < tMin) {
         tMin = tFloor;
-        color = vec3(0.8, 0.8, 0.9); // sol gris clair
+        baseColor = vec3(0.8, 0.8, 0.9); // sol gris clair
+        hitType = 1;
+        hitPos = ro + tFloor * rd;
+        hitNormal = vec3(0, 1, 0);
     }
     if (wallHit && tWall > 0.0 && tWall < tMin) {
         tMin = tWall;
-        color = vec3(0.36, 0.25, 0.20); // mur marron
+        baseColor = vec3(0.36, 0.25, 0.20); // mur marron
+        hitType = 2;
+        hitPos = ro + tWall * rd;
+        hitNormal = vec3(0, 0, 1);
     }
     if (tableHit && tTable > 0.0 && tTable < tMin) {
         tMin = tTable;
-        color = vec3(0.0, 0.35, 0.55); // table bleu
+        baseColor = vec3(0.0, 0.35, 0.55); // table bleu
+        hitType = 3;
+        hitPos = ro + tTable * rd;
+        hitNormal = vec3(0, 1, 0);
     }
     if (netHit && tNet > 0.0 && tNet < tMin) {
         tMin = tNet;
-        color = vec3(0.9, 0.9, 0.9); // filet blanc
+        baseColor = vec3(0.9, 0.9, 0.9); // filet blanc
+        hitType = 4;
+        hitPos = ro + tNet * rd;
+        hitNormal = vec3(0, 1, 0);
     }
     if (sphHit && tSph > 0.0 && tSph < tMin) {
         tMin = tSph;
-        color = vec3(0.7, 0.7, 0.7); // sphère grise
+        baseColor = vec3(0.95, 0.95, 0.85); // balle lumineuse (soleil)
+        hitType = 5;
+        hitPos = ro + tSph * rd;
+        hitNormal = nSph;
+    }
+
+    vec3 color = baseColor;
+    // Si ce n'est pas la balle, on éclaire avec la balle
+    if (hitType != 0 && hitType != 5) {
+        vec3 lightDir = normalize(sphereCenter - hitPos);
+        float dist = length(sphereCenter - hitPos);
+        float tShadowSph, tShadowTable, tShadowNet, tShadowFloor, tShadowWall;
+        vec3 nShadow;
+        bool shadowSph = intersectSphere(hitPos + hitNormal * 0.001, lightDir, sphereCenter, sphereRadius, tShadowSph, nShadow);
+        bool shadowTable = intersectBox(hitPos + hitNormal * 0.001, lightDir, tableMin, tableMax, tShadowTable);
+        bool shadowNet = intersectBox(hitPos + hitNormal * 0.001, lightDir, netMin, netMax, tShadowNet);
+        bool shadowFloor = intersectBox(hitPos + hitNormal * 0.001, lightDir, floorMin, floorMax, tShadowFloor);
+        bool shadowWall = intersectBox(hitPos + hitNormal * 0.001, lightDir, wallMin, wallMax, tShadowWall);
+        float intensity = 0.0;
+        float diffuse = 0.0;
+        // Si le point voit la balle et aucun autre objet n'est entre le point et la balle
+        bool shadow = false;
+        if (shadowSph && tShadowSph > 0.0 && tShadowSph < dist) {
+            // Vérifie qu'aucun autre objet n'est plus proche que la balle
+            shadow = ( (!shadowTable || tShadowTable < 0.0 || tShadowTable >= dist)
+                    && (!shadowNet   || tShadowNet   < 0.0 || tShadowNet   >= dist)
+                    && (!shadowFloor || tShadowFloor < 0.0 || tShadowFloor >= dist)
+                    && (!shadowWall  || tShadowWall  < 0.0 || tShadowWall  >= dist) );
+        }
+        if (shadow) {
+            intensity = 2.0 / (dist * dist); // ou autre valeur
+            diffuse = max(dot(hitNormal, lightDir), 0.0);
+        }
+        color = baseColor * (diffuse * intensity);
     }
     FragColor = vec4(color, 1.0);
 }
