@@ -18,10 +18,6 @@ const tReal tableXmax = 2.0f;
 const tReal wallHeight = 0.20f;
 const tReal wallWidth = 0.06f;
 const tReal wallLength = 0.2f;
-const tReal wallYmin = tableYmin - 0.5f;
-const tReal wallYmax = tableYmax + 1.5f;
-const tReal wallXmin = -2.5f;
-const tReal wallXmax = wallXmin + wallLength;
 const tReal wallZmax = tableZmin - 0.2f;
 const tReal wallZmin = wallZmax - wallWidth;
 const tReal netWidth = tableXmax - tableXmin;
@@ -29,6 +25,11 @@ const tReal netHeight = 0.15f;
 const tReal netThickness = 0.01f;
 const tReal netY = tableYmax + netHeight;
 const tReal netZ = (tableZmin + tableZmax)/2.0f;
+
+tReal wallXmin=(tableXmin+tableXmax)/2.0f;
+tReal wallXmax=wallXmin + wallLength;
+tReal wallYmin=tableYmax;
+tReal wallYmax=wallYmin + wallHeight;
 
 
 // (Si d'autres fonctions non-inline ou méthodes hors-classes sont nécessaires, les ajouter ici)

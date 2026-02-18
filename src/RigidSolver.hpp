@@ -13,7 +13,8 @@
 
 extern const tReal sphereRadius; 
 extern const tReal tableHeight,tableYmax,tableYmin,tableZmin,tableZmax,tableXmin,tableXmax;
-extern const tReal wallHeight,wallWidth,wallLength,wallYmin,wallYmax,wallXmin,wallXmax,wallZmax,wallZmin;
+extern const tReal wallHeight,wallWidth,wallLength,wallZmax,wallZmin;
+extern tReal wallYmin,wallYmax,wallXmin,wallXmax;
 extern const tReal netWidth,netHeight,netThickness,netY,netZ;
 extern const tReal frontWallXmin, frontWallXmax,frontWallYmin, frontWallYmax,frontWallZ;
 
@@ -557,14 +558,14 @@ private:
     tReal xBall = body->X.x;
     tReal yBall = body->X.y;
     tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.2f) : std::max(xBall, tableXmin-0.2f);
-    tReal wallYcenter = std::max(yBall,tableYmax-0.1f);
+    tReal wallYcenter = std::max(yBall,tableYmax);
     tReal wallHalfLength = (wallLength) * 0.5f;
-    tReal wallInfX = wallXcenter - wallHalfLength;
-    tReal wallMajX = wallXcenter + wallHalfLength;
-    tReal wallInfY = wallYcenter - wallHeight/2;
-    tReal wallMajY = wallYcenter + wallHeight/2;
+    wallXmin = wallXcenter - wallHalfLength;
+    wallXmax = wallXcenter + wallHalfLength;
+    wallYmin = wallYcenter - wallHeight/2;
+    wallYmax = wallYcenter + wallHeight/2;
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
-      if(body->X.x > wallInfX && body->X.x < wallMajX && body->X.y > wallInfY && body->X.y < wallMajY) {
+      if(body->X.x > wallXmin && body->X.x < wallXmax && body->X.y > wallYmin && body->X.y < wallYmax) {
         if(body->V.z < 0) {
           Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
           // Calcul direction balistique pour atteindre la cible

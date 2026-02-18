@@ -645,22 +645,11 @@ void render()
     g_scene.mainShader->set("floorYmax", floorYmax);
     g_scene.mainShader->set("floorZmin", floorZmin);
     g_scene.mainShader->set("floorZmax", floorZmax);
-    // Correction dynamique de la hauteur ET de la position X du mur du fond (mur centré sur la balle)
-    tReal xBall = g_scene.rigidAtt->X.x;
-    float wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.5f) : std::max(xBall, tableXmin-0.5f);
-
-    float wallHalfLength = (wallLength) * 0.5f;
-    float wallXmin_dyn = wallXcenter - wallHalfLength;
-    float wallXmax_dyn = wallXcenter + wallHalfLength;
-    g_scene.mainShader->set("wallXmin", wallXmin_dyn);
-    g_scene.mainShader->set("wallXmax", wallXmax_dyn);
-    // Hauteur dynamique (déjà présent)
-    float wallYcenter = g_scene.rigidAtt->X.y;
-    float wallHalfHeight = (wallHeight) * 0.5f;
-    float wallYmin_dyn = wallYcenter - wallHalfHeight;
-    float wallYmax_dyn = wallYcenter + wallHalfHeight;
-    g_scene.mainShader->set("wallYmin", wallYmin_dyn);
-    g_scene.mainShader->set("wallYmax", wallYmax_dyn);
+    // Position dynamique de la raquette (déjà caclulée dans RigidSolver)
+    g_scene.mainShader->set("wallXmin", wallXmin);
+    g_scene.mainShader->set("wallXmax", wallXmax);
+    g_scene.mainShader->set("wallYmin", wallYmin);
+    g_scene.mainShader->set("wallYmax", wallYmax);
     g_scene.mainShader->set("wallZmin", wallZmin);
     g_scene.mainShader->set("wallZmax", wallZmax);
 
