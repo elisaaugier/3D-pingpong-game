@@ -236,6 +236,7 @@ struct Scene {
         }
     }
     // --- FIN ENVOI REBONDS ---
+
     mainShader->set("material.albedo", glm::vec3(0.0, 0.35, 0.55)); // bleu typique table ping-pong
     mainShader->set("material.albedoTexLoaded", 0);
     mainShader->set("material.normalTexLoaded", 0);
@@ -676,9 +677,11 @@ void render()
     }
     // --- FIN ENVOI REBONDS ---
 
+    glDisable(GL_DEPTH_TEST); // Désactive le depth test pour le rendu du mur de devant
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    glEnable(GL_DEPTH_TEST); // Réactive le depth test
     g_scene.mainShader->stop();
     // Réactive le depth test pour la suite si besoin
     glEnable(GL_DEPTH_TEST);

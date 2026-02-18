@@ -30,4 +30,5 @@ const tReal netThickness = 0.01f;
 const tReal netY = tableYmax + netHeight;
 const tReal netZ = (tableZmin + tableZmax)/2.0f;
 
+
 // (Si d'autres fonctions non-inline ou méthodes hors-classes sont nécessaires, les ajouter ici)

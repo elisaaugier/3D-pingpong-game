@@ -15,6 +15,7 @@ extern const tReal sphereRadius;
 extern const tReal tableHeight,tableYmax,tableYmin,tableZmin,tableZmax,tableXmin,tableXmax;
 extern const tReal wallHeight,wallWidth,wallLength,wallYmin,wallYmax,wallXmin,wallXmax,wallZmax,wallZmin;
 extern const tReal netWidth,netHeight,netThickness,netY,netZ;
+extern const tReal frontWallXmin, frontWallXmax,frontWallYmin, frontWallYmax,frontWallZ;
 
 extern Vec3f posInit;
 extern tReal speed;

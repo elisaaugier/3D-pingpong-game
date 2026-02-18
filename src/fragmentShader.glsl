@@ -144,6 +144,7 @@ void main()
         }
     }
     // --- FIN AJOUT ---
+    float spotAlpha = 0.0;
 
     vec3 color = baseColor;
     float ambientStrength = 0.15; // intensité de la lumière ambiante
