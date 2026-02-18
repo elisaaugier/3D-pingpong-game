@@ -166,7 +166,7 @@ struct Scene {
   float netHeight = 0.1f; // Hauteur du filet
 
   glm::vec3 scene_center = glm::vec3(0);
-  float scene_radius = 1.f;
+  float scene_radius = 1.0f;
 
   // shaders to render the meshes
   std::shared_ptr<ShaderProgram> mainShader;
@@ -177,7 +177,7 @@ struct Scene {
 
   void resetSim()
   {
-    *rigidAtt = Sphere(0.6f); // sphère de rayon 0.6
+    *rigidAtt = Sphere(0.03f); // sphère de rayon 0.6
     rigidAtt->X = posInit;
     rigidAtt->V = Vec3f(0,0,0);
     rigidAtt->P = Vec3f(0,0,0);

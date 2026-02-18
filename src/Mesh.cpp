@@ -10,6 +10,11 @@
 #include <ios>
 #include <string>
 #include <memory>
+#include <vector>
+#include <memory>
+#include <string>
+#include <map>
+#include <set>
 
 Mesh::~Mesh()
 {
