@@ -19,6 +19,12 @@ uniform float netWidth, netHeight, netThickness;
 // Floor min/max bounds
 uniform float floorXmin, floorXmax, floorYmin, floorYmax, floorZmin, floorZmax;
 
+// --- AJOUT POUR SPOTS DE REBOND ---
+#define MAX_BOUNCES 32
+uniform int nTableBounces;
+uniform vec3 tableBouncePositions[MAX_BOUNCES];
+// --- FIN AJOUT ---
+
 // Ray-sphere intersection
 bool intersectSphere(vec3 ro, vec3 rd, vec3 center, float radius, out float t, out vec3 n) {
     vec3 oc = ro - center;
@@ -126,6 +132,18 @@ void main()
         hitPos = ro + tSph * rd;
         hitNormal = nSph;
     }
+
+    // --- AJOUT AFFICHAGE SPOTS ROUGES ---
+    if (hitType == 3) { // sur la table
+        float spotRadius = 0.06; // rayon visuel du spot
+        for (int i = 0; i < nTableBounces; ++i) {
+            float d = length(hitPos.xz - tableBouncePositions[i].xz);
+            if (d < spotRadius) {
+                baseColor = mix(baseColor, vec3(1.0, 0.0, 0.0), 0.85); // tâche rouge
+            }
+        }
+    }
+    // --- FIN AJOUT ---
 
     vec3 color = baseColor;
     float ambientStrength = 0.15; // intensité de la lumière ambiante

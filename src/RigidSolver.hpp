@@ -2,6 +2,7 @@
 #define _RIGIDSOLVER_HPP_
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/vec3.hpp>
 #include <iostream>
 #include <ostream>
 #include <vector>
@@ -289,9 +290,9 @@ public:
     }
 
     Vector3<tReal> V1 = computeShotWithNetShortestTime(R1,R2); //vitesse nécessaire post rebond
-    std::cout << "V1 theorique = (" << V1.x << ", " << V1.y << ", " << V1.z << ")" << std::endl;
+    //std::cout << "V1 theorique = (" << V1.x << ", " << V1.y << ", " << V1.z << ")" << std::endl;
     Vector3<tReal> V1before(V1.x, -1 * V1.y / restitution, V1.z); // vitesse que doit avoir la balle avant le rebond en R1 pour atteindre R2 après rebond
-    std::cout << "V1before theorique = (" << V1before.x << ", " << V1before.y << ", " << V1before.z << ")" << std::endl;
+    //std::cout << "V1before theorique = (" << V1before.x << ", " << V1before.y << ", " << V1before.z << ")" << std::endl;
     Vector3<tReal> V0 = computeV0GivenV1(A,R1,V1before); //vitesse nécessaire pour atteindre R1
     return V0;
   }
@@ -463,6 +464,14 @@ public:
 
   BodyAttributes *body;
 
+  // Liste des positions de rebond sur la table
+  std::vector<glm::vec3> tableBouncePositions;
+
+  // Remet à zéro la liste des rebonds sur la table
+  void resetTableBounces() {
+    tableBouncePositions.clear();
+  }
+
 private:
   // Ajout pour gestion d'attente
   bool waitingAtR1 = false;
@@ -491,6 +500,7 @@ private:
 
     // Sol (y = -1)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
+      std::cout << "[DEBUG] Collision sol detectee en y=" << body->X.y << std::endl;
       if(body->V.y < 0) {
         gameOver = true;
         body->V = Vec3f(0,0,0);
@@ -509,13 +519,17 @@ private:
     }*/ 
     // Table (dessus)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0, tableYmax, 0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
+      std::cout << "[DEBUG] Collision table detectee en (" << body->X.x << ", " << body->X.y << ", " << body->X.z << ") V.y=" << body->V.y << std::endl;
       if(body->X.x > tableXmin && body->X.x < tableXmax && body->X.z > tableZmin && body->X.z < tableZmax && body->X.y > tableYmin) {
         if(body->V.y < 0) {
-          std::cout << "V avant rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
+          // Enregistrer la position du rebond
+          std::cout << "[DEBUG] Ajout rebond table en (" << body->X.x << ", " << tableYmax + 0.01f << ", " << body->X.z << ")" << std::endl;
+          tableBouncePositions.push_back(glm::vec3(body->X.x, tableYmax + 0.01f, body->X.z));
+          //std::cout << "V avant rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
           body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
           body->P = body->V * body->M;
           body->X.y = tableYmax + sphere->radius;
-          std::cout << "V1 reel apres rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
+          //std::cout << "V1 reel apres rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
         }
       }
     }
@@ -588,7 +602,7 @@ private:
       body->V = V0;
       body->P = body->V * body->M;
       // Optionnel : afficher la vitesse calculée pour debug
-      std::cout << "V0 = (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
+      //std::cout << "V0 = (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
 
     }
   } 

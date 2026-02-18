@@ -171,6 +171,7 @@ struct Scene {
     solver.init(rigidAtt.get());
     solver.gameOver = false;
     solver.lastWallTouched = 0;
+    solver.resetTableBounces(); // Efface les tâches rouges
     rigidMat = rigidAtt->worldMat();
   }
 
@@ -223,6 +224,21 @@ struct Scene {
     rigid->render();
 
     // table de pingpong
+    // --- ENVOI DES REBONDS TABLE ---
+    const int MAX_BOUNCES = 32;
+    int nBounces = std::min((int)solver.tableBouncePositions.size(), MAX_BOUNCES);
+    std::vector<glm::vec3> bouncePos(MAX_BOUNCES, glm::vec3(0));
+    for(int i=0; i<nBounces; ++i) bouncePos[i] = solver.tableBouncePositions[i];
+    mainShader->set("nTableBounces", nBounces);
+    glUniform3fv(mainShader->getLocation("tableBouncePositions"), MAX_BOUNCES, &bouncePos[0].x);
+    std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
+    if(nBounces > 0) {
+        std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
+        for(int i=0; i<nBounces; ++i) {
+            std::cout << "[DEBUG] bouncePos[" << i << "] = (" << bouncePos[i].x << ", " << bouncePos[i].y << ", " << bouncePos[i].z << ")" << std::endl;
+        }
+    }
+    // --- FIN ENVOI REBONDS ---
     mainShader->set("material.albedo", glm::vec3(0.0, 0.35, 0.55)); // bleu typique table ping-pong
     mainShader->set("material.albedoTexLoaded", 0);
     mainShader->set("material.normalTexLoaded", 0);
@@ -649,6 +665,22 @@ void render()
     g_scene.mainShader->set("wallYmax", wallYmax_dyn);
     g_scene.mainShader->set("wallZmin", wallZmin);
     g_scene.mainShader->set("wallZmax", wallZmax);
+
+    // --- ENVOI DES REBONDS TABLE POUR LE RAYTRACING ---
+    const int MAX_BOUNCES = 32;
+    int nBounces = std::min((int)g_scene.solver.tableBouncePositions.size(), MAX_BOUNCES);
+    std::vector<glm::vec3> bouncePos(MAX_BOUNCES, glm::vec3(0));
+    for(int i=0; i<nBounces; ++i) bouncePos[i] = g_scene.solver.tableBouncePositions[i];
+    g_scene.mainShader->set("nTableBounces", nBounces);
+    glUniform3fv(g_scene.mainShader->getLocation("tableBouncePositions"), MAX_BOUNCES, &bouncePos[0].x);
+    if(nBounces > 0) {
+        std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
+        for(int i=0; i<nBounces; ++i) {
+            std::cout << "[DEBUG] bouncePos[" << i << "] = (" << bouncePos[i].x << ", " << bouncePos[i].y << ", " << bouncePos[i].z << ")" << std::endl;
+        }
+    }
+    // --- FIN ENVOI REBONDS ---
+
     glBindVertexArray(quadVAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
