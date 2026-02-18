@@ -27,6 +27,7 @@ project(tpProjet)
 add_executable(
   ${PROJECT_NAME}
   src/main.cpp
+  src/RigidSolver.cpp
   # src/Error.cpp # You can include Error.cpp if your system supports OpenGL 4.3 or later; don't forget to replace glad.
   src/Mesh.cpp
   src/ShaderProgram.cpp)

@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/tpProjet.dir/dep/glad/src/gl.c.o.d"
   "CMakeFiles/tpProjet.dir/src/Mesh.cpp.o"
   "CMakeFiles/tpProjet.dir/src/Mesh.cpp.o.d"
+  "CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.o"
+  "CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.o.d"
   "CMakeFiles/tpProjet.dir/src/ShaderProgram.cpp.o"
   "CMakeFiles/tpProjet.dir/src/ShaderProgram.cpp.o.d"
   "CMakeFiles/tpProjet.dir/src/main.cpp.o"

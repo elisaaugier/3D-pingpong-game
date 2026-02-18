@@ -1,58 +1,24 @@
-// ----------------------------------------------------------------------------
-// RigidSolver.hpp
-//
-//  Created on: 18 Dec 2020
-//      Author: Kiwon Um
-//        Mail: kiwon.um@telecom-paris.fr
-//
-// Description: Simple Rigid Body Solver (DO NOT DISTRIBUTE!)
-//
-// Copyright 2020-2026 Kiwon Um
-//
-// The copyright to the computer program(s) herein is the property of Kiwon Um,
-// Telecom Paris, France. The program(s) may be used and/or copied only with
-// the written permission of Kiwon Um or in accordance with the terms and
-// conditions stipulated in the agreement/contract under which the program(s)
-// have been supplied.
-// ----------------------------------------------------------------------------
-
 #ifndef _RIGIDSOLVER_HPP_
 #define _RIGIDSOLVER_HPP_
 
 #include <glm/ext/matrix_transform.hpp>
+#include <iostream>
+#include <ostream>
+#include <vector>
 
 #include "Vector3.hpp"
 #include "Matrix3x3.hpp"
 
 
-extern const tReal sphereRadius = 0.04f;
-extern const tReal tableHeight = 0.15f; // épaisseur visible de la table
-extern const tReal tableYmax = -0.5f ; // y du dessus de la table
-extern const tReal tableYmin = tableYmax-tableHeight;
-extern const tReal tableZmin = -1.13f - 3.5f/2.0f;
-extern const tReal tableZmax = -1.13f + 3.5f/2.0f;
-extern const tReal tableXmin = -2.0f;
-extern const tReal tableXmax = 2.0f;
-extern const tReal wallHeight = 0.20f;
-extern const tReal wallWidth = 0.06f;  //épaisseur du mur du fond
-extern const tReal wallLength = 0.2f;
-extern const tReal wallYmin = tableYmin - 0.5f;
-extern const tReal wallYmax = tableYmax + 1.5f;
-extern const tReal wallXmin = -2.5f;
-extern const tReal wallXmax = wallXmin+wallLength;
-extern const tReal wallZmax = tableZmin - 0.2f;
-extern const tReal wallZmin = wallZmax - wallWidth;
-extern const tReal netWidth = tableXmax - tableXmin;
-extern const tReal netHeight = 0.15f;
-extern const tReal netThickness = 0.01f;
-extern const tReal netY = tableYmax + netHeight;
-extern const tReal netZ = (tableZmin + tableZmax)/2.0f; // position Z du filet (devant la table)
+extern const tReal sphereRadius; 
+extern const tReal tableHeight,tableYmax,tableYmin,tableZmin,tableZmax,tableXmin,tableXmax;
+extern const tReal wallHeight,wallWidth,wallLength,wallYmin,wallYmax,wallXmin,wallXmax,wallZmax,wallZmin;
+extern const tReal netWidth,netHeight,netThickness,netY,netZ;
 
-extern Vec3f posInit((tableXmin + tableXmax)/2, tableYmax + 0.5f, tableZmax);
-tReal speed = 2.0f;
-
-tReal g = 9.81f;
-tReal restitution = 0.561f;
+extern Vec3f posInit;
+extern tReal speed;
+extern tReal g;
+extern tReal restitution;
 
 
 // Quaternion (w + xi + yj + zk)
@@ -322,69 +288,37 @@ public:
         return Vector3<float>(0,0,0);
     }
 
-    float tLine = (zR1 - A.z) / dz;
-
-    // Recherche du bon T1 qui permet d'arriver jusqu'en R2 après rebond en R1
-    float Tmin = 0.05f;
-    float Tmax = 2.0f;
-
-    Vector3<float> bestV0;
-
-    for(int i = 0; i < 60; ++i)
-    {
-        float T1 = 0.5f * (Tmin + Tmax);
-
-        // vitesse pour atteindre R1
-        Vector3<float> v0;
-        v0.x = (R1.x - A.x) / T1;
-        v0.z = (R1.z - A.z) / T1;
-        v0.y = (R1.y - A.y + 0.5f * g * T1 * T1) / T1;
-
-
-        // vitesse après rebond
-        Vector3<float> v1 = v0;
-        v1.y = -restitution * v0.y;
-
-        // temps vers second impact (résolution verticale)
-        float a = -0.5f * g;
-        float b = v1.y;
-        float c = R1.y - R2.y;
-
-        float delta = b*b - 4*a*c;
-        if(delta <= 0)
-        {
-            Tmin = T1;
-            continue;
-        }
-
-        float T2 = (-b - sqrt(delta)) / (2*a);
-        if(T2 <= 0)
-        {
-            Tmin = T1;
-            continue;
-        }
-
-        // position du second impact
-        Vector3<float> P2 = R1 + v1 * T2;
-        P2.y -= 0.5f * g * T2 * T2;
-
-        float errorZ = P2.z - R2.z;
-
-        if (fabs(errorZ) < 1e-4f)
-        {
-            bestV0 = v0;
-            break;
-        }
-
-        if(errorZ > 0)
-            Tmin = T1;
-        else
-            Tmax = T1;
-
-        bestV0 = v0;
-    }
-    return bestV0;
+    Vector3<tReal> V1 = computeShotWithNetShortestTime(R1,R2); //vitesse nécessaire post rebond
+    std::cout << "V1 theorique = (" << V1.x << ", " << V1.y << ", " << V1.z << ")" << std::endl;
+    Vector3<tReal> V1before(V1.x, -1 * V1.y / restitution, V1.z); // vitesse que doit avoir la balle avant le rebond en R1 pour atteindre R2 après rebond
+    std::cout << "V1before theorique = (" << V1before.x << ", " << V1before.y << ", " << V1before.z << ")" << std::endl;
+    Vector3<tReal> V0 = computeV0GivenV1(A,R1,V1before); //vitesse nécessaire pour atteindre R1
+    return V0;
   }
+
+  static Vector3<float> computeV0GivenV1(
+    const Vector3<float>& A,
+    const Vector3<float>& R1,
+    const Vector3<float>& V1before)
+{
+    Vector3<float> V0;
+
+    // Horizontal inchangé
+    V0.x = V1before.x;
+    V0.z = V1before.z;
+
+    // Vertical via conservation énergie
+    float deltaY = R1.y - A.y;
+
+    float inside = V1before.y * V1before.y + 2.0f * g * deltaY;
+
+    if (inside < 0.0f)
+        inside = 0.0f;
+
+    V0.y = -std::sqrt(inside);
+
+    return V0;
+  } 
 
 };
 
@@ -530,6 +464,11 @@ public:
   BodyAttributes *body;
 
 private:
+  // Ajout pour gestion d'attente
+  bool waitingAtR1 = false;
+  float waitStartTime = 0.0f;
+  Vector3<tReal> waitTargetB;
+
   void computeForceAndTorque()
   {
     if(!body) return;
@@ -548,7 +487,6 @@ private:
     // --- Collision planaires unifiées ---
     tReal penetration;
     Vector3<tReal> normalContact;
-    tReal restitution = 1.0f; // 1= rebond parfait
     const Sphere* sphere = static_cast<const Sphere*>(body);
 
     // Sol (y = -1)
@@ -573,9 +511,11 @@ private:
     if(sphere->checkPlaneCollision(Vector3<tReal>(0, tableYmax, 0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->X.x > tableXmin && body->X.x < tableXmax && body->X.z > tableZmin && body->X.z < tableZmax && body->X.y > tableYmin) {
         if(body->V.y < 0) {
+          std::cout << "V avant rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
           body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
           body->P = body->V * body->M;
           body->X.y = tableYmax + sphere->radius;
+          std::cout << "V1 reel apres rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
         }
       }
     }
@@ -643,8 +583,8 @@ private:
       tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
       tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
-      Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
-      //Vector3<tReal> V0 = Sphere::computeService(A,B);
+      //Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
+      Vector3<tReal> V0 = Sphere::computeService(A,B);
       body->V = V0;
       body->P = body->V * body->M;
       // Optionnel : afficher la vitesse calculée pour debug

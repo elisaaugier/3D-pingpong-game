@@ -6,6 +6,11 @@
 },
 {
   "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
+  "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/RigidSolver.cpp\"",
+  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/RigidSolver.cpp"
+},
+{
+  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
   "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/Mesh.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/Mesh.cpp\"",
   "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/Mesh.cpp"
 },

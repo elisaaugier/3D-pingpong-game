@@ -261,6 +261,30 @@ src/Mesh.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/tpProjet.dir/build.make CMakeFiles/tpProjet.dir/src/Mesh.cpp.s
 .PHONY : src/Mesh.cpp.s
 
+src/RigidSolver.o: src/RigidSolver.cpp.o
+.PHONY : src/RigidSolver.o
+
+# target to build an object file
+src/RigidSolver.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tpProjet.dir/build.make CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.o
+.PHONY : src/RigidSolver.cpp.o
+
+src/RigidSolver.i: src/RigidSolver.cpp.i
+.PHONY : src/RigidSolver.i
+
+# target to preprocess a source file
+src/RigidSolver.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tpProjet.dir/build.make CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.i
+.PHONY : src/RigidSolver.cpp.i
+
+src/RigidSolver.s: src/RigidSolver.cpp.s
+.PHONY : src/RigidSolver.s
+
+# target to generate assembly for a file
+src/RigidSolver.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tpProjet.dir/build.make CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.s
+.PHONY : src/RigidSolver.cpp.s
+
 src/ShaderProgram.o: src/ShaderProgram.cpp.o
 .PHONY : src/ShaderProgram.o
 
@@ -331,6 +355,9 @@ help:
 	@echo "... src/Mesh.o"
 	@echo "... src/Mesh.i"
 	@echo "... src/Mesh.s"
+	@echo "... src/RigidSolver.o"
+	@echo "... src/RigidSolver.i"
+	@echo "... src/RigidSolver.s"
 	@echo "... src/ShaderProgram.o"
 	@echo "... src/ShaderProgram.i"
 	@echo "... src/ShaderProgram.s"

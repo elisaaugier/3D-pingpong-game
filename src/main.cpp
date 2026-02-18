@@ -1,21 +1,3 @@
-// ----------------------------------------------------------------------------
-// main.cpp
-//
-//  Created on: 13 Dec 2020
-//      Author: Kiwon Um
-//        Mail: kiwon.um@telecom-paris.fr
-//
-// Description: Lab - Rigid Body Simulator (DO NOT distribute!)
-//
-// Copyright 2020-2026 Kiwon Um
-//
-// The copyright to the computer program(s) herein is the property of Kiwon Um,
-// Telecom Paris, France. The program(s) may be used and/or copied only with
-// the written permission of Kiwon Um or in accordance with the terms and
-// conditions stipulated in the agreement/contract under which the program(s)
-// have been supplied.
-// ----------------------------------------------------------------------------
-
 #define _USE_MATH_DEFINES
 
 #include <glad/gl.h>
