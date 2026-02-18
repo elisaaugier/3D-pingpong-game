@@ -67,6 +67,14 @@ double g_baseX = 0.0, g_baseY = 0.0;
 glm::vec3 g_baseTrans(0.0);
 glm::vec3 g_baseRot(0.0);
 
+// Variables pour orbite caméra
+float g_camOrbitRadius = 6.0f;
+float g_camOrbitYaw = 0.0f;
+float g_camOrbitPitch = 0.0f;
+
+// camera follow mode
+bool g_cameraFollowsBall = false;
+
 // timer
 float g_appTimer = 0.0;
 float g_appTimerLastClockTime;
@@ -86,6 +94,8 @@ const glm::vec3 sunColor = glm::vec3(0.95, 0.95, 0.85); // presque blanc, légè
 
 // Rayon global de la sphère (balle)
 const float g_ballRadius = 0.03f; // rayon par défaut, ajustez si besoin
+// Position initiale de la balle (utilisée pour la caméra libre)
+glm::vec3 g_ballInitPos = glm::vec3(posInit.x, posInit.y, posInit.z);
 
 GLuint loadTextureFromFileToGPU(const std::string &filename)
 {
@@ -137,7 +147,7 @@ struct Light {
 struct Scene {
   Light light;
 
-  RigidSolver solver = RigidSolver(nullptr, Vec3f(0, -0.98, 0));
+  RigidSolver solver = RigidSolver(nullptr, Vec3f(0, -9.81, 0));
   std::shared_ptr<BodyAttributes> rigidAtt = nullptr;
 
   // meshes
@@ -171,7 +181,6 @@ struct Scene {
     rigidAtt->X = posInit;
     rigidAtt->V = Vec3f(0,0,0);
     rigidAtt->P = Vec3f(0,0,0);
-    rigidAtt->omega = Vec3f(0,0,0);
     rigidAtt->L = Vec3f(0,0,0);
     rigidAtt->F = Vec3f(0,0,0);
     rigidAtt->q = Quaternion::identity();
@@ -330,7 +339,6 @@ void windowSizeCallback(GLFWwindow *window, int width, int height)
   // glViewport(0, 0, (GLint)width, (GLint)height); // TEST: commenté pour debug segfault
 }
 
-// Executed each time a key is entered.
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
   if(action == GLFW_PRESS && key == GLFW_KEY_H) {
@@ -370,7 +378,6 @@ void cursorPosCallback(GLFWwindow *window, double xpos, double ypos)
   }
 }
 
-// Called each time a mouse button is pressed
 void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
 {
   if(button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
@@ -399,6 +406,7 @@ void mouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
     g_zoomingP = false;
   }
 }
+
 
 void initGLFW()
 {
@@ -484,6 +492,8 @@ void initScene()
     g_scene.rigidAtt = std::make_shared<Sphere>(g_ballRadius); // même rayon que la géométrie
     g_scene.rigidAtt->X = posInit;
     g_scene.solver.init(g_scene.rigidAtt.get());
+    // Mémorise la position initiale de la balle pour la caméra libre
+    g_ballInitPos = glm::vec3(posInit.x, posInit.y, posInit.z);
 
     g_scene.plane = std::make_shared<Mesh>();
     g_scene.plane->addPlane();
@@ -534,14 +544,24 @@ void initScene()
 
   // Adjust the camera to the mesh
   g_meshScale = g_scene.scene_radius;
-  glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z); // balle
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 10.0);
-  g_cam->setPosition(camPos);
-  // Calcul de la rotation pour regarder vers la cible
-  glm::vec3 dir = glm::normalize(camTarget - camPos);
-  float yaw = atan2(dir.x, -dir.z); // Yaw autour de l'axe Y
-  float pitch = asin(dir.y);        // Pitch autour de l'axe X
-  g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
+  // Utilise la position initiale de la balle comme cible caméra libre
+  glm::vec3 camTarget = g_cameraFollowsBall ? glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z) : g_ballInitPos;
+  if (g_cameraFollowsBall) {
+    glm::vec3 camPos = camTarget + glm::vec3(0.0, 2.0, 10.0);
+    g_cam->setPosition(camPos);
+    glm::vec3 dir = glm::normalize(camTarget - camPos);
+    float yaw = atan2(dir.x, dir.z); // Yaw autour de l'axe Y
+    float pitch = asin(-dir.y);        // Pitch autour de l'axe X
+    g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
+  } else {
+    // Initialisation orbite
+    g_camOrbitRadius = 6.0f;
+    g_camOrbitYaw = 0.0f;
+    g_camOrbitPitch = 0.0f;
+    glm::vec3 camPos = camTarget + glm::vec3(0.0, 2.0, g_camOrbitRadius);
+    g_cam->setPosition(camPos);
+    g_cam->setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
+  }
   g_cam->setNear(g_meshScale/100.f);
   g_cam->setFar(6.0*g_meshScale);
 
@@ -626,7 +646,9 @@ void render()
     g_scene.mainShader->set("floorZmin", floorZmin);
     g_scene.mainShader->set("floorZmax", floorZmax);
     // Correction dynamique de la hauteur ET de la position X du mur du fond (mur centré sur la balle)
-    float wallXcenter = g_scene.rigidAtt->X.x;
+    tReal xBall = g_scene.rigidAtt->X.x;
+    float wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.5f) : std::max(xBall, tableXmin-0.5f);
+
     float wallHalfLength = (wallLength) * 0.5f;
     float wallXmin_dyn = wallXcenter - wallHalfLength;
     float wallXmax_dyn = wallXcenter + wallHalfLength;
@@ -660,13 +682,34 @@ void update(const float currentTime)
     g_scene.rigidMat = g_scene.rigidAtt->worldMat();
   }
   g_scene.light.position = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
-  glm::vec3 camTarget = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
-  glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 5.0);
-  g_cam->setPosition(camPos);
-  glm::vec3 dir = glm::normalize(camTarget - camPos);
-  float yaw = atan2(dir.x, -dir.z);
-  float pitch = asin(dir.y);
-  g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
+  if (g_cameraFollowsBall)
+  {
+      glm::vec3 camTarget = glm::vec3(
+          g_scene.rigidAtt->X.x,
+          g_scene.rigidAtt->X.y,
+          g_scene.rigidAtt->X.z
+      );
+      glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 5.0);
+      g_cam->setPosition(camPos);
+      glm::vec3 dir = glm::normalize(camTarget - camPos);
+      float yaw   = atan2(dir.x, dir.z);
+      float pitch = asin(-dir.y);
+      g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
+  }
+  else
+  {
+      glm::vec3 target = g_ballInitPos;
+      float camX = target.x + g_camOrbitRadius * cos(g_camOrbitPitch) * sin(g_camOrbitYaw);
+      float camY = 1.5f;
+      float camZ = target.z + g_camOrbitRadius * cos(g_camOrbitPitch) * cos(g_camOrbitYaw);
+      glm::vec3 camPos(camX, camY, camZ);
+      g_cam->setPosition(camPos);
+      glm::vec3 dir = glm::normalize(target - camPos);
+      float yaw   = atan2(dir.x, dir.z);
+      float pitch = asin(-dir.y);
+      g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
+  }
+
   // Rayon sphère visible
   static_cast<Sphere*>(g_scene.rigidAtt.get())->radius = g_ballRadius;
 }

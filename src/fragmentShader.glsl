@@ -100,7 +100,7 @@ void main()
     }
     if (wallHit && tWall > 0.0 && tWall < tMin) {
         tMin = tWall;
-        baseColor = vec3(0.36, 0.25, 0.20); // mur marron
+        baseColor = (wallXmin >  (tableXmin+tableXmax)/2) ? vec3(0.0, 0.4, 1.0) : vec3(1.0, 0.2, 0.6); //couleur du mur du fond
         hitType = 2;
         hitPos = ro + tWall * rd;
         hitNormal = vec3(0, 0, 1);
@@ -128,7 +128,7 @@ void main()
     }
 
     vec3 color = baseColor;
-    float ambientStrength = 0.2; // intensité de la lumière ambiante
+    float ambientStrength = 0.15; // intensité de la lumière ambiante
     vec3 ambient = ambientStrength * baseColor;
     // Si ce n'est pas la balle, on éclaire avec la balle
     if (hitType != 0 && hitType != 5) {

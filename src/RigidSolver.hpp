@@ -45,11 +45,11 @@ extern const tReal wallZmin = wallZmax - wallWidth;
 extern const tReal netWidth = tableXmax - tableXmin;
 extern const tReal netHeight = 0.15f;
 extern const tReal netThickness = 0.01f;
-extern const tReal netY = -0.5f + 0.02f/2 + 0.15f/2; // même Y que le mesh
-extern const tReal netZ = -1.13f;
+extern const tReal netY = tableYmax + netHeight;
+extern const tReal netZ = (tableZmin + tableZmax)/2.0f; // position Z du filet (devant la table)
 
-Vec3f posInit((tableXmin + tableXmax)/2, tableYmax + 0.5f, tableZmax);
-tReal speed = 5.0f;
+extern Vec3f posInit((tableXmin + tableXmax)/2, tableYmax + 0.5f, tableZmax);
+tReal speed = 2.0f;
 
 tReal g = 9.81f;
 tReal restitution = 0.561f;
@@ -187,12 +187,12 @@ public:
         v0.y += 0.5f * g * T;
 
         if (fabs(v0.z) < 1e-6f)
-            return -1e6f;
+            return -1e-6f;
 
         float tNet = (netZ - A.z) / v0.z;
 
         if (tNet <= 0.0f || tNet >= T)
-            return -1e6f;
+            return -1e-6f;
 
         float yAtNet =
             A.y + v0.y * tNet
@@ -275,7 +275,7 @@ public:
                 {
                     float yAtNet = A.y + v0.y * tNet - 0.5f * g * tNet * tNet;
 
-                    if (yAtNet > netY+4*sphereRadius)
+                    if (yAtNet > netY+30*sphereRadius)
                     {
                         // vitesse minimale réalisable
                         return v0;
@@ -493,7 +493,7 @@ public:
 
   void step(const tReal dt)
   {
-    std::cout << "t=" << _sim_t << " (dt=" << dt << ")" << std::endl;
+    //std::cout << "t=" << _sim_t << " (dt=" << dt << ")" << std::endl;
 
     computeForceAndTorque();
 
@@ -580,11 +580,14 @@ private:
       }
     }
     // Mur (arrière, plan z = tableZmin - 0.2)
-    // On centre dynamiquement le mur sur la balle (comme dans le raytracer)
-    tReal wallX = body->X.x;
+    // On centre dynamiquement le mur sur la balle 
+    tReal xBall = body->X.x;
+    tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.5f) : std::max(xBall, tableXmin-0.5f);
+
+    tReal wallHalfLength = (wallLength) * 0.5f;
+    tReal wallInfX = wallXcenter - wallHalfLength;
+    tReal wallMajX = wallXcenter + wallHalfLength;
     tReal wallY = body->X.y;
-    tReal wallInfX = wallX - wallLength/2;
-    tReal wallMajX = wallX + wallLength/2;
     tReal wallInfY = wallY - wallHeight/2;
     tReal wallMajY = wallY + wallHeight/2;
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
