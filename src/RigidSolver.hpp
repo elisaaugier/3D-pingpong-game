@@ -531,8 +531,8 @@ private:
           scorePong++;
           std::cout << "Point pour PONG ! Score: " << scorePing << " - " << scorePong << std::endl;
         }
-        gameOver = true;
-        std::cout << "gameOver=" << gameOver << std::endl;
+        //gameOver = true;
+        //std::cout << "gameOver=" << gameOver << std::endl;
         body->V = Vec3f(0,0,0);
         body->P = body->V * body->M;
         body->F = Vec3f(0,0,0);
