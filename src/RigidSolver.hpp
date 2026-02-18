@@ -312,9 +312,7 @@ public:
     }
 
     Vector3<tReal> V1 = computeShotWithNetShortestTime(R1,R2); //vitesse nécessaire post rebond
-    //std::cout << "V1 theorique = (" << V1.x << ", " << V1.y << ", " << V1.z << ")" << std::endl;
     Vector3<tReal> V1before(V1.x, -1 * V1.y / restitution, V1.z); // vitesse que doit avoir la balle avant le rebond en R1 pour atteindre R2 après rebond
-    //std::cout << "V1before theorique = (" << V1before.x << ", " << V1before.y << ", " << V1before.z << ")" << std::endl;
     Vector3<tReal> V0 = computeV0GivenV1(A,R1,V1before); //vitesse nécessaire pour atteindre R1
     return V0;
   }
@@ -432,6 +430,8 @@ public:
 
   bool gameOver = false;       // true si la balle a touché le sol
   int lastWallTouched = 0;     // 0 = none 1 = mur du fond, 2 = mur de devant
+  int scorePing = 0;
+  int scorePong = 0;
 
   void init(BodyAttributes *body0)
   {
@@ -523,6 +523,14 @@ private:
     // Sol (y = -1)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->V.y < 0) {
+        // Incrémentation du score selon le dernier mur touché
+        if (lastWallTouched == 1) {
+          scorePing++;
+          std::cout << "Point pour PING ! Score: " << scorePing << " - " << scorePong << std::endl;
+        } else if (lastWallTouched == 2) {
+          scorePong++;
+          std::cout << "Point pour PONG ! Score: " << scorePing << " - " << scorePong << std::endl;
+        }
         gameOver = true;
         body->V = Vec3f(0,0,0);
         body->P = body->V * body->M;
@@ -544,12 +552,9 @@ private:
         if(body->V.y < 0) {
           // Enregistrer la position du rebond
           tableBouncePositions.push_back(glm::vec3(body->X.x, tableYmax + 0.01f, body->X.z));
-          //std::cout << "V avant rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
           body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
           body->P = body->V * body->M;
           body->X.y = tableYmax + sphere->radius;
-          std::cout << "Rebond sur la table en (" << body->X.x << ", " << body->X.y << ", " << body->X.z << ")" << std::endl;
-          //std::cout << "V1 reel apres rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
         }
       }
     }
@@ -567,6 +572,7 @@ private:
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
       if(body->X.x > wallXmin && body->X.x < wallXmax && body->X.y > wallYmin && body->X.y < wallYmax) {
         if(body->V.z < 0) {
+          std::cout << "ping" << std::endl;
           Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
           // Calcul direction balistique pour atteindre la cible
           tReal filetZ = netZ;
@@ -574,7 +580,6 @@ private:
           tReal targetZ = RigidSolver::targetZ(filetZ, fondZ);
           tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
           Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
-          std::cout << "targetZ depuis mur du fond = " << targetZ << std::endl;
           Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
           body->V = V0;
           body->P = body->V * body->M;
@@ -593,6 +598,7 @@ private:
       tReal maxY = tableYmax + 2.0f;
       if(body->X.x > minX && body->X.x < maxX && body->X.y > minY && body->X.y < maxY) {
         if(body->V.z > 0) {
+          std::cout << "pong" << std::endl;
           Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
           // Calcul direction balistique pour atteindre la cible
           tReal filetZ = netZ;
@@ -600,7 +606,6 @@ private:
           tReal targetZ = RigidSolver::targetZ(filetZ, fondZ);
           tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
           Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
-          std::cout << "targetZ depuis devant = " << targetZ << std::endl;
           Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
           body->V = V0;
           body->P = body->V * body->M;
@@ -617,16 +622,12 @@ private:
       tReal filetZ = netZ;
       tReal fondZ = tableZmin;
       tReal targetZ = fondZ-(fondZ-filetZ) / 5.0f;
-      std::cout << "targetZ service = " << targetZ << std::endl;
       tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
       //Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
       Vector3<tReal> V0 = Sphere::computeService(A,B);
       body->V = V0;
       body->P = body->V * body->M;
-      // Optionnel : afficher la vitesse calculée pour debug
-      //std::cout << "V0 = (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
-
     }
   } 
   // simulation parameters
