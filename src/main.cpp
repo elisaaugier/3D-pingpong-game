@@ -252,6 +252,9 @@ struct Scene {
     mainShader->set("normMat", glm::mat3(glm::inverseTranspose(netMat)));
     net->render();
 
+    // Envoi de l'état gameOver au shader
+    mainShader->set("gameOver", solver.gameOver ? 1 : 0);
+
     mainShader->stop(); 
 
     if(saveScreenShot) {
@@ -653,6 +656,8 @@ void render()
     g_scene.mainShader->set("wallZmin", wallZmin);
     g_scene.mainShader->set("wallZmax", wallZmax);
 
+    // Envoi de l'état gameOver au shader
+    g_scene.mainShader->set("gameOver", g_scene.solver.gameOver ? 1 : 0);
     // --- ENVOI DES REBONDS TABLE POUR LE RAYTRACING ---
     const int MAX_BOUNCES = 32;
     int nBounces = std::min((int)g_scene.solver.tableBouncePositions.size(), MAX_BOUNCES);

@@ -55,8 +55,15 @@ bool intersectBox(vec3 ro, vec3 rd, vec3 boxMin, vec3 boxMax, out float tNear) {
     return tF >= tN && tF > 0.0;
 }
 
+uniform int gameOver;
+
 void main()
 {
+    if (gameOver == 1) {
+        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
     vec2 ndc = TexCoords * 2.0 - 1.0;
     ndc.x *= aspect;
     float px = ndc.x * tan(radians(fov) * 0.5);
