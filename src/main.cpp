@@ -318,6 +318,7 @@ void printHelp()
     "    * Right button: pan camera" << std::endl <<
     "    Keyboard commands:" << std::endl <<
     "    * H: print this help" << std::endl <<
+    "    * M: changer de mode" << std::endl << // Ajout aide
     "    * P: toggle simulation" << std::endl <<
     "    * R: reset simulation" << std::endl <<
     "    * S: save a screenshot" << std::endl <<
@@ -355,6 +356,9 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   } else if(action == GLFW_PRESS && key == GLFW_KEY_F) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  } else if(action == GLFW_PRESS && key == GLFW_KEY_M) {
+    g_cameraFollowsBall = (g_cameraFollowsBall + 1) % 2; // 2 modes, à adapter si besoin
+    std::cout << "Mode changé: " << g_cameraFollowsBall << std::endl;
   } else if(action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
     glfwSetWindowShouldClose(window, true); // Closes the application if the escape key is pressed
   }
