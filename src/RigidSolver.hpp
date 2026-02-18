@@ -258,7 +258,7 @@ public:
     return Vector3<float>(0,0,0);
   }
 
-  static Vector3<float> computeR1FromR2(
+  /*static Vector3<float> computeR1FromR2(
       const Vector3<float>& A,
       const Vector3<float>& R2,
       float zR1)
@@ -275,6 +275,26 @@ public:
       R1.z = zR1;
 
       return R1;
+  }*/
+
+  static Vector3<float> computeR1FromR2(
+    const Vector3<float>& A,
+    const Vector3<float>& R2,
+    float zR1)
+  {
+    float dz = R2.z - A.z;
+
+    if (fabs(dz) < 1e-6f)
+        return A;
+
+    float t = (zR1 - A.z) / dz;
+
+    Vector3<float> R1;
+    R1.x = A.x + t * (R2.x - A.x);
+    R1.y = tableYmax;  
+    R1.z = zR1;
+
+    return R1;
   }
 
   static Vector3<tReal> computeService(const Vector3<tReal>& A, const Vector3<tReal>& R2)
@@ -500,7 +520,6 @@ private:
 
     // Sol (y = -1)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
-      std::cout << "[DEBUG] Collision sol detectee en y=" << body->X.y << std::endl;
       if(body->V.y < 0) {
         gameOver = true;
         body->V = Vec3f(0,0,0);
@@ -519,31 +538,30 @@ private:
     }*/ 
     // Table (dessus)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0, tableYmax, 0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
-      std::cout << "[DEBUG] Collision table detectee en (" << body->X.x << ", " << body->X.y << ", " << body->X.z << ") V.y=" << body->V.y << std::endl;
       if(body->X.x > tableXmin && body->X.x < tableXmax && body->X.z > tableZmin && body->X.z < tableZmax && body->X.y > tableYmin) {
         if(body->V.y < 0) {
           // Enregistrer la position du rebond
-          std::cout << "[DEBUG] Ajout rebond table en (" << body->X.x << ", " << tableYmax + 0.01f << ", " << body->X.z << ")" << std::endl;
           tableBouncePositions.push_back(glm::vec3(body->X.x, tableYmax + 0.01f, body->X.z));
           //std::cout << "V avant rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
           body->V -= (1.f + restitution) * body->V.dotProduct(normalContact) * normalContact;
           body->P = body->V * body->M;
           body->X.y = tableYmax + sphere->radius;
+          std::cout << "Rebond sur la table en (" << body->X.x << ", " << body->X.y << ", " << body->X.z << ")" << std::endl;
           //std::cout << "V1 reel apres rebond = (" << body->V.x << ", " << body->V.y << ", " << body->V.z << ")" << std::endl;
         }
       }
     }
     // Mur (arrière, plan z = tableZmin - 0.2)
-    // On centre dynamiquement le mur sur la balle 
+    // On centre dynamiquement le mur sur la balle si la raquette reste dans les bornes de la table selon X et au dessus de la table selon Y
     tReal xBall = body->X.x;
-    tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.5f) : std::max(xBall, tableXmin-0.5f);
-
+    tReal yBall = body->X.y;
+    tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.2f) : std::max(xBall, tableXmin-0.2f);
+    tReal wallYcenter = std::max(yBall,tableYmax-0.1f);
     tReal wallHalfLength = (wallLength) * 0.5f;
     tReal wallInfX = wallXcenter - wallHalfLength;
     tReal wallMajX = wallXcenter + wallHalfLength;
-    tReal wallY = body->X.y;
-    tReal wallInfY = wallY - wallHeight/2;
-    tReal wallMajY = wallY + wallHeight/2;
+    tReal wallInfY = wallYcenter - wallHeight/2;
+    tReal wallMajY = wallYcenter + wallHeight/2;
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
       if(body->X.x > wallInfX && body->X.x < wallMajX && body->X.y > wallInfY && body->X.y < wallMajY) {
         if(body->V.z < 0) {
@@ -551,9 +569,10 @@ private:
           // Calcul direction balistique pour atteindre la cible
           tReal filetZ = netZ;
           tReal fondZ = tableZmax;
-          tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+          tReal targetZ = RigidSolver::targetZ(filetZ, fondZ);
           tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
           Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
+          std::cout << "targetZ depuis mur du fond = " << targetZ << std::endl;
           Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
           body->V = V0;
           body->P = body->V * body->M;
@@ -576,9 +595,10 @@ private:
           // Calcul direction balistique pour atteindre la cible
           tReal filetZ = netZ;
           tReal fondZ = tableZmin;
-          tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+          tReal targetZ = RigidSolver::targetZ(filetZ, fondZ);
           tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
           Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
+          std::cout << "targetZ depuis devant = " << targetZ << std::endl;
           Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
           body->V = V0;
           body->P = body->V * body->M;
@@ -594,7 +614,8 @@ private:
       // Point d'arrivée (B)
       tReal filetZ = netZ;
       tReal fondZ = tableZmin;
-      tReal targetZ = (filetZ + fondZ) / 2.0f; // milieu Z entre filet et fond
+      tReal targetZ = fondZ-(fondZ-filetZ) / 5.0f;
+      std::cout << "targetZ service = " << targetZ << std::endl;
       tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
       //Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
@@ -610,6 +631,14 @@ private:
   Vec3f _g;                     // gravity
   tIndex _step;                 // step count
   tReal _sim_t;                 // simulation time
+
+  // Fonction utilitaire pour choisir un Z aléatoire entre (Z1+Z2)/2 et Z2
+  static float targetZ(float Z1, float Z2) {
+      float minZ = 0.5f * (Z1 + Z2);
+      float maxZ = Z2;
+      float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+      return minZ + r * (maxZ - minZ);
+  }
 };
 
 #endif  /* _RIGIDSOLVER_HPP_ */

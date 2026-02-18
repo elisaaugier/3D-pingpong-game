@@ -231,11 +231,8 @@ struct Scene {
     for(int i=0; i<nBounces; ++i) bouncePos[i] = solver.tableBouncePositions[i];
     mainShader->set("nTableBounces", nBounces);
     glUniform3fv(mainShader->getLocation("tableBouncePositions"), MAX_BOUNCES, &bouncePos[0].x);
-    std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
     if(nBounces > 0) {
-        std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
         for(int i=0; i<nBounces; ++i) {
-            std::cout << "[DEBUG] bouncePos[" << i << "] = (" << bouncePos[i].x << ", " << bouncePos[i].y << ", " << bouncePos[i].z << ")" << std::endl;
         }
     }
     // --- FIN ENVOI REBONDS ---
@@ -674,9 +671,7 @@ void render()
     g_scene.mainShader->set("nTableBounces", nBounces);
     glUniform3fv(g_scene.mainShader->getLocation("tableBouncePositions"), MAX_BOUNCES, &bouncePos[0].x);
     if(nBounces > 0) {
-        std::cout << "[DEBUG] nTableBounces sent to shader: " << nBounces << std::endl;
         for(int i=0; i<nBounces; ++i) {
-            std::cout << "[DEBUG] bouncePos[" << i << "] = (" << bouncePos[i].x << ", " << bouncePos[i].y << ", " << bouncePos[i].z << ")" << std::endl;
         }
     }
     // --- FIN ENVOI REBONDS ---
@@ -696,7 +691,7 @@ void update(const float currentTime)
     const float dt = currentTime - g_appTimerLastClockTime;
     g_appTimerLastClockTime = currentTime;
     g_appTimer += dt;
-    g_scene.solver.step(std::min(dt, 0.017f));
+    g_scene.solver.step(std::min(dt, 0.02f));
     g_scene.rigidMat = g_scene.rigidAtt->worldMat();
   }
   g_scene.light.position = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
