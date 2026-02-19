@@ -149,7 +149,7 @@ public:
   static Vector3<float> computeShotWithNetShortestTime(
     const Vector3<float>& A,
     const Vector3<float>& B)
-  {
+{
     auto heightAtNet = [&](float T)
     {
         Vector3<float> v0 = (B - A) / T;
@@ -290,6 +290,8 @@ public:
         return A;
 
     float t = (zR1 - A.z) / dz;
+    if (dz > 0)
+        t = -t;
 
     Vector3<float> R1;
     R1.x = A.x + t * (R2.x - A.x);
@@ -302,7 +304,7 @@ public:
   static Vector3<tReal> computeService(const Vector3<tReal>& A, const Vector3<tReal>& R2)
   {
     // R1 dans la diagonale entre A et R2
-    tReal zR1 = netZ + (tableZmax-tableZmin) * 0.25f;
+    tReal zR1 = (R2.z < A.z) ? netZ + (tableZmax - tableZmin) * 0.25f : netZ - (tableZmax - tableZmin) * 0.25f;
 
     Vector3<tReal> R1 = computeR1FromR2(A, R2, zR1);
     float dz = R2.z - A.z;
@@ -314,15 +316,23 @@ public:
     Vector3<tReal> V1 = computeShotWithNetShortestTime(R1,R2); //vitesse nécessaire post rebond
     Vector3<tReal> V1before(V1.x, -1 * V1.y / restitution, V1.z); // vitesse que doit avoir la balle avant le rebond en R1 pour atteindre R2 après rebond
     Vector3<tReal> V0 = computeV0GivenV1(A,R1,V1before); //vitesse nécessaire pour atteindre R1
+
+    // Debug prints to inspect service calculation
+    std::cout << "[computeService] A=(" << A.x << "," << A.y << "," << A.z << ") R2=(" << R2.x << "," << R2.y << "," << R2.z << ")\n";
+    std::cout << "[computeService] R1=(" << R1.x << "," << R1.y << "," << R1.z << ") R1.y=" << R1.y << "\n";
+    std::cout << "[computeService] V1=(" << V1.x << "," << V1.y << "," << V1.z << ")\n";
+    std::cout << "[computeService] V1before=(" << V1before.x << "," << V1before.y << "," << V1before.z << ")\n";
+    std::cout << "[computeService] V0=(" << V0.x << "," << V0.y << "," << V0.z << ")\n";
+
     return V0;
   }
 
-  static Vector3<tReal> computeV0GivenV1(
-    const Vector3<tReal>& A,
-    const Vector3<tReal>& R1,
-    const Vector3<tReal>& V1before)
-  {
-    Vector3<tReal> V0;
+  static Vector3<float> computeV0GivenV1(
+    const Vector3<float>& A,
+    const Vector3<float>& R1,
+    const Vector3<float>& V1before)
+{
+    Vector3<float> V0;
 
     // Horizontal inchangé
     V0.x = V1before.x;
@@ -330,16 +340,16 @@ public:
 
     // Vertical via conservation énergie
     float deltaY = R1.y - A.y;
+
     float inside = V1before.y * V1before.y + 2.0f * g * deltaY;
 
     if (inside < 0.0f)
         inside = 0.0f;
 
-    // Corrige le signe selon le sens désiré
-    V0.y = (deltaY >= 0.0f) ? std::sqrt(inside) : -std::sqrt(inside);
+    V0.y = -std::sqrt(inside);
 
     return V0;
-  }
+  } 
 
 };
 
@@ -643,9 +653,9 @@ private:
       tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
       std::cout << "Service vers (" << B.x << ", " << B.y << ", " << B.z << ")" << std::endl;
-      // Calcul de la vitesse de service adaptée
-      Vector3<tReal> V0 = Sphere::computeService(A,B);
-      std::cout << "Vitesse de service : (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
+
+      // Compute initial velocity directly from A to B (passage over the net) — no R1
+      Vector3<tReal> V0 = Sphere::computeService(A, B);
       body->V = V0;
       body->P = body->V * body->M;
     }
