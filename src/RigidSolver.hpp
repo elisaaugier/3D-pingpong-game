@@ -149,7 +149,7 @@ public:
   static Vector3<float> computeShotWithNetShortestTime(
     const Vector3<float>& A,
     const Vector3<float>& B)
-{
+  {
     auto heightAtNet = [&](float T)
     {
         Vector3<float> v0 = (B - A) / T;
@@ -317,12 +317,12 @@ public:
     return V0;
   }
 
-  static Vector3<float> computeV0GivenV1(
-    const Vector3<float>& A,
-    const Vector3<float>& R1,
-    const Vector3<float>& V1before)
-{
-    Vector3<float> V0;
+  static Vector3<tReal> computeV0GivenV1(
+    const Vector3<tReal>& A,
+    const Vector3<tReal>& R1,
+    const Vector3<tReal>& V1before)
+  {
+    Vector3<tReal> V0;
 
     // Horizontal inchangé
     V0.x = V1before.x;
@@ -330,16 +330,16 @@ public:
 
     // Vertical via conservation énergie
     float deltaY = R1.y - A.y;
-
     float inside = V1before.y * V1before.y + 2.0f * g * deltaY;
 
     if (inside < 0.0f)
         inside = 0.0f;
 
-    V0.y = -std::sqrt(inside);
+    // Corrige le signe selon le sens désiré
+    V0.y = (deltaY >= 0.0f) ? std::sqrt(inside) : -std::sqrt(inside);
 
     return V0;
-  } 
+  }
 
 };
 
@@ -426,12 +426,24 @@ class RigidSolver {
 public:
   explicit RigidSolver(
     BodyAttributes *body0=nullptr, const Vec3f g=Vec3f(0, 0, 0)) :
-    body(body0), _g(g), _step(0), _sim_t(0), gameOver(false), lastWallTouched(0) {}
+    body(body0), _g(g), _step(0), _sim_t(0), gameOver(false), lastWallTouched(2) {}
 
   bool gameOver = false;       // true si la balle a touché le sol
-  int lastWallTouched = 0;     // 0 = none 1 = mur du fond, 2 = mur de devant
+  int lastWallTouched = 2;     // 0 = none 1 = mur du fond, 2 = mur de devant
   int scorePing = 0;
   int scorePong = 0;
+
+  // Manuel keyboard/mouse control override
+  bool manualWallMode = false; // si true, la position de la raquette est contrôlée manuellement via setManualWallPosition
+
+  // Définit la position centrale de la raquette en mode manuel (en unités monde)
+  void setManualWallPosition(const tReal centerX, const tReal centerY) {
+    tReal halfLen = (wallLength) * 0.5f;
+    wallXmin = centerX - halfLen;
+    wallXmax = centerX + halfLen;
+    wallYmin = centerY - wallHeight/2.0f;
+    wallYmax = centerY + wallHeight/2.0f;
+  }
 
   void init(BodyAttributes *body0)
   {
@@ -524,6 +536,7 @@ private:
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->V.y < 0) {
         // Incrémentation du score selon le dernier mur touché
+        std::cout<<lastWallTouched<<std::endl;
         if (lastWallTouched == 1) {
           scorePing++;
           std::cout << "Point pour PING ! Score: " << scorePing << " - " << scorePong << std::endl;
@@ -531,12 +544,11 @@ private:
           scorePong++;
           std::cout << "Point pour PONG ! Score: " << scorePing << " - " << scorePong << std::endl;
         }
-        //gameOver = true;
+        gameOver = true;
         //std::cout << "gameOver=" << gameOver << std::endl;
         body->V = Vec3f(0,0,0);
         body->P = body->V * body->M;
         body->F = Vec3f(0,0,0);
-        body->tau = Vec3f(0,0,0);
         body->X.y = -1.0f + sphere->radius;
       }
     }
@@ -561,15 +573,17 @@ private:
     }
     // Mur (arrière, plan z = tableZmin - 0.2)
     // On centre dynamiquement le mur sur la balle si la raquette reste dans les bornes de la table selon X et au dessus de la table selon Y
-    tReal xBall = body->X.x;
-    tReal yBall = body->X.y;
-    tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.2f) : std::max(xBall, tableXmin-0.2f);
-    tReal wallYcenter = std::max(yBall,tableYmax);
-    tReal wallHalfLength = (wallLength) * 0.5f;
-    wallXmin = wallXcenter - wallHalfLength;
-    wallXmax = wallXcenter + wallHalfLength;
-    wallYmin = wallYcenter - wallHeight/2;
-    wallYmax = wallYcenter + wallHeight/2;
+    if(!manualWallMode) {
+      tReal xBall = body->X.x;
+      tReal yBall = body->X.y;
+      tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.2f) : std::max(xBall, tableXmin-0.2f);
+      tReal wallYcenter = std::max(yBall,tableYmax);
+      tReal wallHalfLength = (wallLength) * 0.5f;
+      wallXmin = wallXcenter - wallHalfLength;
+      wallXmax = wallXcenter + wallHalfLength;
+      wallYmin = wallYcenter - wallHeight/2;
+      wallYmax = wallYcenter + wallHeight/2;
+    }
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
       if(body->X.x > wallXmin && body->X.x < wallXmax && body->X.y > wallYmin && body->X.y < wallYmax) {
         if(body->V.z < 0) {
@@ -593,8 +607,8 @@ private:
     // rebond devant raquette (plan z = tableZmax + 0.2)
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,tableZmax + 0.2f), Vector3<tReal>(0,0,-1), penetration, normalContact)) {
       // Limites identiques au mur visuel
-      tReal minX = tableXmin - 0.2f;
-      tReal maxX = tableXmax + 0.2f;
+      tReal minX = tableXmin+0.1f;
+      tReal maxX = tableXmax-0.1f;
       tReal minY = tableYmin - 0.1f;
       tReal maxY = tableYmax + 2.0f;
       if(body->X.x > minX && body->X.x < maxX && body->X.y > minY && body->X.y < maxY) {
@@ -619,14 +633,19 @@ private:
     if(_step==1 && !body->vdata0.empty()) {
       // Point de départ (A) : position actuelle de la balle
       Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
-      // Point d'arrivée (B)
-      tReal filetZ = netZ;
-      tReal fondZ = tableZmin;
-      tReal targetZ = fondZ-(fondZ-filetZ) / 5.0f;
+      std::cout << "Position de service A: (" << A.x << ", " << A.y << ", " << A.z << ")" << std::endl;
+      // Choix du côté de service : deux services devant, deux derrière, ...
+      int totalPoints = scorePing + scorePong;
+      int group = (totalPoints / 2) % 2; // 0 = front side, 1 = back side
+      tReal fondZ = (group == 0) ? tableZmin : tableZmax;
+      // Point d'arrivée (B) : cible sur l'autre moitié du terrain (proche du fond)
+      tReal targetZ = (group==0) ? fondZ + 0.2f*(abs(fondZ - netZ)) : fondZ - 0.2f*(abs(fondZ - netZ)); // interpole vers le fond depuis le filet
       tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
-      //Vector3<tReal> V0 = Sphere::computeShotWithNetShortestTime(A,B);
+      std::cout << "Service vers (" << B.x << ", " << B.y << ", " << B.z << ")" << std::endl;
+      // Calcul de la vitesse de service adaptée
       Vector3<tReal> V0 = Sphere::computeService(A,B);
+      std::cout << "Vitesse de service : (" << V0.x << ", " << V0.y << ", " << V0.z << ")" << std::endl;
       body->V = V0;
       body->P = body->V * body->M;
     }

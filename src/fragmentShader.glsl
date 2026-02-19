@@ -59,10 +59,10 @@ uniform int gameOver;
 
 void main()
 {
-    if (gameOver == 1) {
+    /*if (gameOver == 1) {
         FragColor = vec4(0.0, 0.0, 0.0, 1.0);
         return;
-    }
+    }*/
 
     vec2 ndc = TexCoords * 2.0 - 1.0;
     ndc.x *= aspect;

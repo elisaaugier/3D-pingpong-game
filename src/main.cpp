@@ -57,6 +57,11 @@ float g_camOrbitPitch = 0.0f;
 // camera follow mode
 bool g_cameraFollowsBall = false;
 
+// Manual keyboard mode for the wall (toggle with K)
+bool g_manualKeyboardMode = true;
+// Keyboard movement speed in world units per second
+float g_keyboardMoveSpeed = 4.5f;
+
 // timer
 float g_appTimer = 0.0;
 float g_appTimerLastClockTime;
@@ -160,7 +165,18 @@ struct Scene {
   void resetSim()
   {
     *rigidAtt = Sphere(0.03f); // sphère de rayon 0.6
-    rigidAtt->X = posInit;
+    // Choix du côté de service selon le score: deux points devant, deux points derrière, etc.
+    int totalPoints = solver.scorePing + solver.scorePong;
+    int group = (totalPoints / 2) % 2; // 0 = front, 1 = back
+    glm::vec3 startPos = glm::vec3(posInit.x, posInit.y, posInit.z);
+    if(group == 0) {
+      // devant (côté tableZmax)
+      startPos.z = tableZmax;
+    } else {
+      // derrière (côté tableZmin)
+      startPos.z = tableZmin;
+    }
+    rigidAtt->X = Vec3f(startPos.x, startPos.y, startPos.z);
     rigidAtt->V = Vec3f(0,0,0);
     rigidAtt->P = Vec3f(0,0,0);
     rigidAtt->L = Vec3f(0,0,0);
@@ -170,7 +186,8 @@ struct Scene {
     rigidAtt->Iinv = rigidAtt->R * rigidAtt->I0inv * rigidAtt->R.transposed();
     solver.init(rigidAtt.get());
     solver.gameOver = false;
-    solver.lastWallTouched = 0;
+    // Indique quel mur va servir: 1 = mur du fond, 2 = mur de devant
+    solver.lastWallTouched = (group == 0) ? 2 : 1;
     solver.resetTableBounces(); // Efface les tâches rouges
     rigidMat = rigidAtt->worldMat();
   }
@@ -358,6 +375,10 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
   } else if(action == GLFW_PRESS && key == GLFW_KEY_M) {
     g_cameraFollowsBall = (g_cameraFollowsBall + 1) % 2; // 2 modes, à adapter si besoin
     std::cout << "Mode changé: " << g_cameraFollowsBall << std::endl;
+  } else if(action == GLFW_PRESS && key == GLFW_KEY_K) {
+    // bascule le mode manuel clavier pour la raquette
+    g_manualKeyboardMode = !g_manualKeyboardMode;
+    std::cout << "Manual keyboard wall mode: " << (g_manualKeyboardMode ? "ON" : "OFF") << std::endl;
   } else if(action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
     glfwSetWindowShouldClose(window, true); // Closes the application if the escape key is pressed
   }
@@ -684,6 +705,40 @@ void render()
 // Update any accessible variable based on the current time
 void update(const float currentTime)
 {
+  // --- Mode manuel pour la raquette (mur arrière) ---
+  // g_scene.solver.manualWallMode = true; // Toujours actif
+
+  // --- Mode clavier: flèches pour déplacer la raquette ---
+  if(g_manualKeyboardMode) {
+    // active le mode manuel dans le solver pour empêcher le centrage automatique
+    g_scene.solver.manualWallMode = true;
+
+    // calcule un dt par frame (toujours actif, même si la simulation est en pause)
+    static float prevUpdateTime = currentTime;
+    float frameDt = currentTime - prevUpdateTime;
+    prevUpdateTime = currentTime;
+    if(frameDt <= 0.0f) frameDt = 1.0f/60.0f;
+
+    float moveX = 0.0f;
+    float moveY = 0.0f;
+    if(glfwGetKey(g_window, GLFW_KEY_LEFT) == GLFW_PRESS)  moveX -= g_keyboardMoveSpeed * frameDt;
+    if(glfwGetKey(g_window, GLFW_KEY_RIGHT) == GLFW_PRESS) moveX += g_keyboardMoveSpeed * frameDt;
+    if(glfwGetKey(g_window, GLFW_KEY_UP) == GLFW_PRESS)    moveY += g_keyboardMoveSpeed * frameDt;
+    if(glfwGetKey(g_window, GLFW_KEY_DOWN) == GLFW_PRESS)  moveY -= g_keyboardMoveSpeed * frameDt;
+
+    // Calcule le centre courant de la raquette à partir des bornes
+    float centerX = 0.5f * (wallXmin + wallXmax);
+    float centerY = 0.5f * (wallYmin + wallYmax);
+    centerX += moveX;
+    centerY += moveY;
+    g_scene.solver.setManualWallPosition(centerX, centerY);
+
+  } else {
+    // Désactive le mode manuel dans le solver pour permettre le centrage automatique
+    g_scene.solver.manualWallMode = false;
+    // Ne pas appeler setManualWallPosition ici : laisser le solver repositionner le mur en fonction de la balle
+  }
+
   if(!g_appTimerStoppedP) {
     const float dt = currentTime - g_appTimerLastClockTime;
     g_appTimerLastClockTime = currentTime;
