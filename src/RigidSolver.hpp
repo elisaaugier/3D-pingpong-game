@@ -451,7 +451,8 @@ public:
   void setManualWallPosition(const tReal centerX, const tReal centerY) {
     // stocke le centre et le rayon (pour compatibilité on met à jour les bornes rectangulaires)
     wallCenterX = centerX;
-    wallCenterY = centerY;
+    tReal dy = centerY-wallCenterY;
+    wallCenterY += 0.5f*dy;
     // choisi le rayon comme la moitié de la plus petite des dimensions originelles (wallLength, wallHeight)
     wallRadius = std::min(wallLength, wallHeight) * 0.5f;
 

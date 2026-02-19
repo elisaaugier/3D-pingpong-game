@@ -80,7 +80,7 @@ unsigned int g_normalTexOnGPU;
 const glm::vec3 sunColor = glm::vec3(0.95, 0.95, 0.85); // presque blanc, légèrement chaud
 
 // Rayon global de la sphère (balle)
-const float g_ballRadius = 0.03f; // rayon par défaut, ajustez si besoin
+const float g_ballRadius = sphereRadius; // rayon par défaut, ajustez si besoin
 // Position initiale de la balle (utilisée pour la caméra libre)
 glm::vec3 g_ballInitPos = glm::vec3(posInit.x, posInit.y, posInit.z);
 
