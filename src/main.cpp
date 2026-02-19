@@ -67,6 +67,9 @@ float g_appTimer = 0.0;
 float g_appTimerLastClockTime;
 bool g_appTimerStoppedP = true;
 
+// match finished flag (true when someone reached 3 sets) ---
+bool g_matchOver = false;
+
 // textures
 unsigned int g_availableTextureSlot = 0;
 
@@ -369,7 +372,12 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
   if(action == GLFW_PRESS && key == GLFW_KEY_H) {
     printHelp();
   } else if(action == GLFW_PRESS && key == GLFW_KEY_R) {
-    g_scene.resetSim();
+    // Prevent restarting after match finished
+    if (g_matchOver) {
+      std::cout << "Match terminé — reset désactivé (tape ESC pour quitter)." << std::endl;
+    } else {
+      g_scene.resetSim();
+    }
   } else if(action == GLFW_PRESS && key == GLFW_KEY_S) {
     g_scene.saveScreenShot = true;
   } else if(action == GLFW_PRESS && key == GLFW_KEY_P) {
@@ -464,7 +472,7 @@ void initGLFW()
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
   // Create the window
-  g_window = glfwCreateWindow(g_windowWidth, g_windowHeight, "A Simple Rigid Body Simulator", nullptr, nullptr);
+  g_window = glfwCreateWindow(g_windowWidth, g_windowHeight, "Ping Pong Game: A Real-Time Raytracing Simulation", nullptr, nullptr);
   if(!g_window) {
     std::cerr << "ERROR: Failed to open window" << std::endl;
     glfwTerminate();
@@ -710,10 +718,6 @@ void render()
     for(int i=0; i<nBounces; ++i) bouncePos[i] = g_scene.solver.tableBouncePositions[i];
     g_scene.mainShader->set("nTableBounces", nBounces);
     glUniform3fv(g_scene.mainShader->getLocation("tableBouncePositions"), MAX_BOUNCES, &bouncePos[0].x);
-    if(nBounces > 0) {
-        for(int i=0; i<nBounces; ++i) {
-        }
-    }
     // --- ENVOI TRAIL POSITIONS ---
     const int MAX_TRAIL = 64;
     // Number of points to actually render (can be lower than stored history)
@@ -728,7 +732,7 @@ void render()
     }
     g_scene.mainShader->set("nTrail", nRender);
     glUniform3fv(g_scene.mainShader->getLocation("trailPositions"), MAX_TRAIL, &trailPos[0].x);
-    // --- FIN ENVOI REBONDS ---
+    // --- FIN ENVOI TRAILS ---
 
     glDisable(GL_DEPTH_TEST); // Désactive le depth test pour le rendu du mur de devant
     glBindVertexArray(quadVAO);
@@ -785,6 +789,16 @@ void update(const float currentTime)
     g_scene.rigidMat = g_scene.rigidAtt->worldMat();
   }
   g_scene.light.position = glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z);
+  // --- NEW: detect match end (3 sets) and lock resets ---
+  if (!g_matchOver && (g_scene.solver.setPing >= 3 || g_scene.solver.setPong >= 3)) {
+    g_matchOver = true;
+    g_scene.solver.gameOver = true; // stop simulation
+    if (g_scene.solver.setPing >= 3)
+      std::cout << "Match gagné par PING ! Resets désactivés." << std::endl;
+    else
+      std::cout << "Match gagné par PONG ! Resets désactivés." << std::endl;
+  }
+
   if (g_cameraFollowsBall)
   {
       glm::vec3 camTarget = glm::vec3(

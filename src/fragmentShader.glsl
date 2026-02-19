@@ -179,7 +179,7 @@ void main()
 
     // lighting: start from baseColor and compute a modest ambient term
     vec3 color = baseColor;
-    float ambientStrength = (manualWallMode == 1) ? 0.4 : 0.015; // reduced ambient for less global brightness
+    float ambientStrength = (manualWallMode == 1) ? 0.2 : 0.015; // reduced ambient for less global brightness
     vec3 ambient = ambientStrength * baseColor;
     // Si ce n'est pas la balle, on éclaire avec la balle
     if (hitType != 0 && hitType != 5) {
