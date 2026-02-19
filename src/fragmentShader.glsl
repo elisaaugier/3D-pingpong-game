@@ -9,6 +9,8 @@ uniform mat4 viewMat;
 uniform mat4 projMat;
 uniform vec3 sphereCenter;
 uniform float sphereRadius;
+// velocity of the sphere (for trail rendering)
+uniform vec3 sphereVelocity;
 uniform float fov;
 uniform float aspect;
 
@@ -28,6 +30,10 @@ uniform int manualWallMode;
 #define MAX_BOUNCES 32
 uniform int nTableBounces;
 uniform vec3 tableBouncePositions[MAX_BOUNCES];
+// trail uniforms
+#define MAX_TRAIL 64
+uniform int nTrail;
+uniform vec3 trailPositions[MAX_TRAIL];
 // --- FIN AJOUT ---
 
 // Ray-sphere intersection
@@ -171,8 +177,9 @@ void main()
     // --- FIN AJOUT ---
     float spotAlpha = 0.0;
 
+    // lighting: start from baseColor and compute a modest ambient term
     vec3 color = baseColor;
-    float ambientStrength = (manualWallMode == 1) ? 0.20 : 0.02; // intensité de la lumière ambiante dépend du mode manuel
+    float ambientStrength = (manualWallMode == 1) ? 0.06 : 0.015; // reduced ambient for less global brightness
     vec3 ambient = ambientStrength * baseColor;
     // Si ce n'est pas la balle, on éclaire avec la balle
     if (hitType != 0 && hitType != 5) {
@@ -202,5 +209,68 @@ void main()
     } else {
         color = ambient + baseColor;
     }
-    FragColor = vec4(color, 1.0);
+    // Use the lighting result computed above (includes ambient and direct term)
+    vec3 finalColor = color; // keep computed lighting (not a raw baseColor recomposition)
+
+    // --- subtle white trail behind the ball (contrail-like) ---
+    float vlen = length(sphereVelocity);
+    if (vlen > 1e-4) {
+        vec3 velDir = normalize(sphereVelocity);
+        // trail parameters (adjustable)
+        float trailLen = 0.6;                    // length of the contrail in world units (halved)
+        float trailStartOffset = 0.05;           // start just behind the ball
+        float trailRadiusMax = max(sphereRadius * 1.4, 0.08); // max radius near the ball
+        float trailRadiusMin = 0.06;             // thin tip radius
+
+        // find the point on the ray closest to the sphere center
+        float tClosest = dot(sphereCenter - ro, rd);
+        if (tClosest > 0.0 && tClosest < tMin) { // only consider trail if it's before the first hit (not occluded)
+            vec3 pClosest = ro + tClosest * rd;
+            // compute longitudinal coordinate along the trail (0 at just behind sphere)
+            float along = dot(pClosest - (sphereCenter - velDir * trailStartOffset), -velDir);
+            if (along > 0.0 && along < trailLen) {
+                // center point on trail for this 'along'
+                vec3 trailCenterPoint = sphereCenter - velDir * (along + trailStartOffset);
+                float radial = length(pClosest - trailCenterPoint);
+                float radiusAt = mix(trailRadiusMax, trailRadiusMin, smoothstep(0.0, trailLen, along));
+                // smooth radial falloff and longitudinal fade
+                float radialFactor = 1.0 - smoothstep(0.0, radiusAt, radial);
+                float longFactor = 1.0 - (along / trailLen);
+                float alpha = radialFactor * longFactor * 0.85; // overall strength
+                alpha = clamp(alpha, 0.0, 1.0);
+                // apply a soft blend with white (reduced strength)
+                finalColor = mix(finalColor, vec3(1.0), alpha * 0.5);
+            }
+        }
+    }
+
+    // --- CONTRAIL HISTORY RENDERING (disks at sampled trail positions) ---
+    if (nTrail > 0) {
+        // iterate recent samples (newest last)
+        for (int i = 0; i < nTrail; ++i) {
+            int idx = nTrail - 1 - i; // start from newest
+            vec3 tp = trailPositions[idx];
+            // project to camera ray closest point check
+            float tProj = dot(tp - ro, rd);
+            if (tProj > 0.0 && tProj < tMin) {
+                vec3 pOnRay = ro + tProj * rd;
+                // skip sample if vertical separation is large (avoid distant artifacts)
+                float ySep = abs(pOnRay.y - tp.y);
+                float ageFactor = float(i) / float(nTrail); // 0 newest -> 1 oldest
+                float diskRadius = mix(0.06, 0.02, ageFactor); // older samples smaller (increased for visibility)
+                if (ySep > diskRadius * 3.5) continue; // relax vertical filter to keep more samples
+                // use full 3D distance for a robust test
+                float d3 = length(pOnRay - tp);
+                float alpha = 1.0 - smoothstep(0.0, diskRadius, d3);
+                alpha *= mix(0.9, 0.05, ageFactor); // fade by age
+                alpha = clamp(alpha, 0.0, 1.0);
+                // stronger blend for visibility
+                finalColor = mix(finalColor, vec3(1.0), alpha * 0.9);
+            }
+        }
+    }
+
+    // clamp to avoid extreme brightness
+    finalColor = clamp(finalColor, vec3(0.0), vec3(1.0));
+    FragColor = vec4(finalColor, 1.0);
 }

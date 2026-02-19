@@ -509,6 +509,15 @@ public:
       body->Iinv = body->R * body->I0inv * body->R.transposed();
     }
 
+    // After integrating position, record trail sample
+    if(body) {
+      // record a trail sample every step: cap history to MAX_TRAIL
+      const int MAX_TRAIL = 64;
+      glm::vec3 sample(body->X.x, body->X.y, body->X.z);
+      trailPositions.push_back(sample);
+      if ((int)trailPositions.size() > MAX_TRAIL) trailPositions.erase(trailPositions.begin());
+    }
+
     ++_step;
     _sim_t += dt;
   }
@@ -517,10 +526,17 @@ public:
 
   // Liste des positions de rebond sur la table
   std::vector<glm::vec3> tableBouncePositions;
+  // Historique des positions de la balle pour la traînée (contrail)
+  std::vector<glm::vec3> trailPositions;
 
   // Remet à zéro la liste des rebonds sur la table
   void resetTableBounces() {
     tableBouncePositions.clear();
+  }
+
+  // Remet à zéro la traînée
+  void resetTrail() {
+    trailPositions.clear();
   }
 
 private:

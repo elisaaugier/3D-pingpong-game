@@ -658,6 +658,8 @@ void render()
     g_scene.mainShader->set("aspect", g_cam->getAspectRatio());
     // Envoi de la position de la balle au shader ray tracing
     g_scene.mainShader->set("sphereCenter", glm::vec3(g_scene.rigidAtt->X.x, g_scene.rigidAtt->X.y, g_scene.rigidAtt->X.z));
+    // Envoi de la vitesse de la balle pour le rendu de la traînée
+    g_scene.mainShader->set("sphereVelocity", glm::vec3(g_scene.rigidAtt->V.x, g_scene.rigidAtt->V.y, g_scene.rigidAtt->V.z));
     // Envoi de la hauteur du filet au shader ray tracing
     g_scene.mainShader->set("netHeight", g_scene.netHeight);
     // Envoi du rayon de la sphère au shader ray tracing
@@ -712,6 +714,20 @@ void render()
         for(int i=0; i<nBounces; ++i) {
         }
     }
+    // --- ENVOI TRAIL POSITIONS ---
+    const int MAX_TRAIL = 64;
+    // Number of points to actually render (can be lower than stored history)
+    const int RENDER_TRAIL_SAMPLES = 24; // adjust to change visible point count
+    int stored = (int)g_scene.solver.trailPositions.size();
+    int nTrail = std::min(stored, MAX_TRAIL);
+    int nRender = std::min(nTrail, RENDER_TRAIL_SAMPLES);
+    std::vector<glm::vec3> trailPos(MAX_TRAIL, glm::vec3(0.0f));
+    // copy the most recent nRender samples (keep order oldest->newest)
+    for(int i=0;i<nRender;++i) {
+        trailPos[i] = g_scene.solver.trailPositions[stored - nRender + i];
+    }
+    g_scene.mainShader->set("nTrail", nRender);
+    glUniform3fv(g_scene.mainShader->getLocation("trailPositions"), MAX_TRAIL, &trailPos[0].x);
     // --- FIN ENVOI REBONDS ---
 
     glDisable(GL_DEPTH_TEST); // Désactive le depth test pour le rendu du mur de devant
