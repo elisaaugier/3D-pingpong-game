@@ -696,6 +696,8 @@ void render()
     g_scene.mainShader->set("wallCenterX", g_scene.solver.wallCenterX);
     g_scene.mainShader->set("wallCenterY", g_scene.solver.wallCenterY);
     g_scene.mainShader->set("wallRadius",  g_scene.solver.wallRadius);
+    // Send manual mode flag to shader
+    g_scene.mainShader->set("manualWallMode", g_scene.solver.manualWallMode ? 1 : 0);
 
     // Envoi de l'état gameOver au shader
     g_scene.mainShader->set("gameOver", g_scene.solver.gameOver ? 1 : 0);

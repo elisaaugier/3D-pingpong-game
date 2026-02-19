@@ -22,7 +22,8 @@ uniform float wallRadius;
 uniform float netWidth, netHeight, netThickness;
 // Floor min/max bounds
 uniform float floorXmin, floorXmax, floorYmin, floorYmax, floorZmin, floorZmax;
-
+// manual mode flag (1 = manual, 0 = automatic)
+uniform int manualWallMode;
 // --- AJOUT POUR SPOTS DE REBOND ---
 #define MAX_BOUNCES 32
 uniform int nTableBounces;
@@ -171,7 +172,7 @@ void main()
     float spotAlpha = 0.0;
 
     vec3 color = baseColor;
-    float ambientStrength = 0.15; // intensité de la lumière ambiante
+    float ambientStrength = (manualWallMode == 1) ? 0.20 : 0.02; // intensité de la lumière ambiante dépend du mode manuel
     vec3 ambient = ambientStrength * baseColor;
     // Si ce n'est pas la balle, on éclaire avec la balle
     if (hitType != 0 && hitType != 5) {
@@ -202,4 +203,72 @@ void main()
         color = ambient + baseColor;
     }
     FragColor = vec4(color, 1.0);
+
+    // dessin visuel de la raquette (disque) pour l'overlay
+    // compute intersection of ray with plane z = wallZmax
+    float tPaddle = (wallZmax - ro.z) / rd.z;
+    if (tPaddle > 0.0) {
+        vec3 pP = ro + tPaddle * rd;
+        vec2 pPxy = vec2(pP.x, pP.y);
+        if (length(pPxy - vec2(paddleCX, paddleCY)) <= paddleR) {
+            // highlight paddle area
+            baseColor = mix(baseColor, vec3(0.9,0.9,0.2), 0.45);
+            hitType = 4; // visual paddle
+            hitPos = pP;
+            hitNormal = vec3(0,0,1);
+        }
+    }
+
+    // draw a simple stick-figure beside the paddle (on the same wall plane)
+    // helper: distance from point p to segment [a,b]
+    float sdSegment(vec2 p, vec2 a, vec2 b) {
+        vec2 pa = p - a;
+        vec2 ba = b - a;
+        float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+        return length(pa - ba * h);
+    }
+
+    float tStick = (wallZmax - ro.z) / rd.z;
+    if (tStick > 0.0 && tStick < tMin) {
+        vec3 pS = ro + tStick * rd;
+        vec2 pSxy = vec2(pS.x, pS.y);
+        // place stick figure to the right of the paddle by offset
+        float sideOffset = paddleR + 0.25;
+        vec2 stickCenter = vec2(paddleCX + sideOffset, paddleCY - 0.05);
+        float stickScale = max(0.12, paddleR * 0.9);
+        // head
+        vec2 headC = stickCenter + vec2(0.0, 0.45 * stickScale);
+        float headR = 0.18 * stickScale;
+        float headDist = length(pSxy - headC);
+        // body
+        vec2 bodyTop = headC - vec2(0.0, headR);
+        vec2 bodyBottom = bodyTop - vec2(0.0, 0.6 * stickScale);
+        float bodyDist = sdSegment(pSxy, bodyTop, bodyBottom);
+        // arms
+        vec2 armLeft = bodyTop + vec2(-0.35 * stickScale, -0.15 * stickScale);
+        vec2 armRight = bodyTop + vec2( 0.35 * stickScale, -0.15 * stickScale);
+        float armLeftDist = sdSegment(pSxy, bodyTop - vec2(0.05*stickScale,0.0), armLeft);
+        float armRightDist = sdSegment(pSxy, bodyTop - vec2(0.05*stickScale,0.0), armRight);
+        // legs
+        vec2 legLeft = bodyBottom + vec2(-0.25 * stickScale, -0.45 * stickScale);
+        vec2 legRight = bodyBottom + vec2( 0.25 * stickScale, -0.45 * stickScale);
+        float legLeftDist = sdSegment(pSxy, bodyBottom, legLeft);
+        float legRightDist = sdSegment(pSxy, bodyBottom, legRight);
+        float thickness = 0.035 * stickScale;
+        bool hitStick = false;
+        if (headDist <= headR) {
+            baseColor = mix(baseColor, vec3(1.0,0.9,0.7), 0.9);
+            hitStick = true;
+        }
+        if (bodyDist <= thickness) { baseColor = mix(baseColor, vec3(0.95,0.8,0.2), 0.9); hitStick = true; }
+        if (armLeftDist <= thickness) { baseColor = mix(baseColor, vec3(0.95,0.8,0.2), 0.9); hitStick = true; }
+        if (armRightDist <= thickness) { baseColor = mix(baseColor, vec3(0.95,0.8,0.2), 0.9); hitStick = true; }
+        if (legLeftDist <= thickness) { baseColor = mix(baseColor, vec3(0.95,0.8,0.2), 0.9); hitStick = true; }
+        if (legRightDist <= thickness) { baseColor = mix(baseColor, vec3(0.95,0.8,0.2), 0.9); hitStick = true; }
+        if (hitStick) {
+            hitType = 6; // stick figure
+            hitPos = pS;
+            hitNormal = vec3(0,0,1);
+        }
+    }
 }
