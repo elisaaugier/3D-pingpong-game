@@ -15,6 +15,10 @@ uniform float aspect;
 // Uniforms for min/max variables
 uniform float tableXmin, tableXmax, tableYmin, tableYmax, tableZmin, tableZmax;
 uniform float wallXmin, wallXmax, wallYmin, wallYmax, wallZmin, wallZmax;
+// NEW: circular paddle parameters (sent from main.cpp)
+uniform float wallCenterX;
+uniform float wallCenterY;
+uniform float wallRadius;
 uniform float netWidth, netHeight, netThickness;
 // Floor min/max bounds
 uniform float floorXmin, floorXmax, floorYmin, floorYmax, floorZmin, floorZmax;
@@ -97,6 +101,10 @@ void main()
     vec3 wallMax = vec3(wallXmax, wallYmax, wallZmax);
     float tWall;
     bool wallHit = intersectBox(ro, rd, wallMin, wallMax, tWall);
+    // paddle circle parameters
+    float paddleCX = wallCenterX;
+    float paddleCY = wallCenterY;
+    float paddleR  = wallRadius;
 
     // On cherche l'objet le plus proche
     float tMin = 1e20;
@@ -112,11 +120,20 @@ void main()
         hitNormal = vec3(0, 1, 0);
     }
     if (wallHit && tWall > 0.0 && tWall < tMin) {
-        tMin = tWall;
-        baseColor = (wallXmin >  (tableXmin+tableXmax)/2) ? vec3(0.0, 0.4, 1.0) : vec3(1.0, 0.2, 0.6); //couleur du mur du fond
-        hitType = 2;
-        hitPos = ro + tWall * rd;
-        hitNormal = vec3(0, 0, 1);
+        // compute impact point on wall
+        vec3 wp = ro + tWall * rd;
+        // check whether impact is inside circular paddle
+        vec2 wp2 = wp.xz; // use x and y? wall plane is z=const so use x,y coordinates: use x and y
+        // correct: we must use x and y components
+        vec2 wp_xy = vec2(wp.x, wp.y);
+        float d2 = dot(wp_xy - vec2(paddleCX, paddleCY), wp_xy - vec2(paddleCX, paddleCY));
+        if (d2 <= paddleR * paddleR) {
+            tMin = tWall;
+            baseColor = (wallXmin >  (tableXmin+tableXmax)/2) ? vec3(0.0, 0.4, 1.0) : vec3(1.0, 0.2, 0.6); //couleur du mur du fond
+            hitType = 2;
+            hitPos = wp;
+            hitNormal = vec3(0, 0, 1);
+        }
     }
     if (tableHit && tTable > 0.0 && tTable < tMin) {
         tMin = tTable;

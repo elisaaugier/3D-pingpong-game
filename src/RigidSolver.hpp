@@ -317,13 +317,6 @@ public:
     Vector3<tReal> V1before(V1.x, -1 * V1.y / restitution, V1.z); // vitesse que doit avoir la balle avant le rebond en R1 pour atteindre R2 après rebond
     Vector3<tReal> V0 = computeV0GivenV1(A,R1,V1before); //vitesse nécessaire pour atteindre R1
 
-    // Debug prints to inspect service calculation
-    std::cout << "[computeService] A=(" << A.x << "," << A.y << "," << A.z << ") R2=(" << R2.x << "," << R2.y << "," << R2.z << ")\n";
-    std::cout << "[computeService] R1=(" << R1.x << "," << R1.y << "," << R1.z << ") R1.y=" << R1.y << "\n";
-    std::cout << "[computeService] V1=(" << V1.x << "," << V1.y << "," << V1.z << ")\n";
-    std::cout << "[computeService] V1before=(" << V1before.x << "," << V1before.y << "," << V1before.z << ")\n";
-    std::cout << "[computeService] V0=(" << V0.x << "," << V0.y << "," << V0.z << ")\n";
-
     return V0;
   }
 
@@ -436,23 +429,37 @@ class RigidSolver {
 public:
   explicit RigidSolver(
     BodyAttributes *body0=nullptr, const Vec3f g=Vec3f(0, 0, 0)) :
-    body(body0), _g(g), _step(0), _sim_t(0), gameOver(false), lastWallTouched(2) {}
+    body(body0), _g(g), _step(0), _sim_t(0), gameOver(false), lastWallTouched(2),
+    wallCenterX(0.0f), wallCenterY(0.0f), wallRadius(std::min(wallLength, wallHeight)*0.7f) {}
 
   bool gameOver = false;       // true si la balle a touché le sol
   int lastWallTouched = 2;     // 0 = none 1 = mur du fond, 2 = mur de devant
   int scorePing = 0;
   int scorePong = 0;
+  int setPing = 0;   // number of sets won by Ping
+  int setPong = 0;   // number of sets won by Pong
 
   // Manuel keyboard/mouse control override
   bool manualWallMode = false; // si true, la position de la raquette est contrôlée manuellement via setManualWallPosition
 
+  // Circle representation for the paddle (raquette)
+  tReal wallCenterX = 0.0f;   // centre X de la raquette (en unités monde)
+  tReal wallCenterY = 0.0f;   // centre Y de la raquette (en unités monde)
+  tReal wallRadius  = 0.0f;   // rayon de la raquette (en unités monde)
+
   // Définit la position centrale de la raquette en mode manuel (en unités monde)
   void setManualWallPosition(const tReal centerX, const tReal centerY) {
-    tReal halfLen = (wallLength) * 0.5f;
-    wallXmin = centerX - halfLen;
-    wallXmax = centerX + halfLen;
-    wallYmin = centerY - wallHeight/2.0f;
-    wallYmax = centerY + wallHeight/2.0f;
+    // stocke le centre et le rayon (pour compatibilité on met à jour les bornes rectangulaires)
+    wallCenterX = centerX;
+    wallCenterY = centerY;
+    // choisi le rayon comme la moitié de la plus petite des dimensions originelles (wallLength, wallHeight)
+    wallRadius = std::min(wallLength, wallHeight) * 0.5f;
+
+    // met à jour les bornes rectangulaires pour compatibilité avec le reste du code
+    wallXmin = wallCenterX - wallRadius;
+    wallXmax = wallCenterX + wallRadius;
+    wallYmin = wallCenterY - wallRadius;
+    wallYmax = wallCenterY + wallRadius;
   }
 
   void init(BodyAttributes *body0)
@@ -546,13 +553,27 @@ private:
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,-1,0), Vector3<tReal>(0,1,0), penetration, normalContact)) {
       if(body->V.y < 0) {
         // Incrémentation du score selon le dernier mur touché
-        std::cout<<lastWallTouched<<std::endl;
         if (lastWallTouched == 1) {
           scorePing++;
           std::cout << "Point pour PING ! Score: " << scorePing << " - " << scorePong << std::endl;
+          // check set win: at least 11 points AND 2 points advantage
+          if (scorePing >= 11 && (scorePing - scorePong) >= 2) {
+            setPing++;
+            std::cout << "Set pour PING ! Sets: " << setPing << " - " << setPong << std::endl;
+            // reset points for new set
+            scorePing = 0;
+            scorePong = 0;
+          }
         } else if (lastWallTouched == 2) {
           scorePong++;
           std::cout << "Point pour PONG ! Score: " << scorePing << " - " << scorePong << std::endl;
+          if (scorePong >= 11 && (scorePong - scorePing) >= 2) {
+            setPong++;
+            std::cout << "Set pour PONG ! Sets: " << setPing << " - " << setPong << std::endl;
+            // reset points for new set
+            scorePing = 0;
+            scorePong = 0;
+          }
         }
         gameOver = true;
         //std::cout << "gameOver=" << gameOver << std::endl;
@@ -586,16 +607,24 @@ private:
     if(!manualWallMode) {
       tReal xBall = body->X.x;
       tReal yBall = body->X.y;
-      tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax+0.2f) : std::max(xBall, tableXmin-0.2f);
+      tReal wallXcenter = (xBall > (tableXmin+tableXmax)/2) ? std::min(xBall, tableXmax) : std::max(xBall, tableXmin);
       tReal wallYcenter = std::max(yBall,tableYmax);
-      tReal wallHalfLength = (wallLength) * 0.5f;
-      wallXmin = wallXcenter - wallHalfLength;
-      wallXmax = wallXcenter + wallHalfLength;
-      wallYmin = wallYcenter - wallHeight/2;
-      wallYmax = wallYcenter + wallHeight/2;
+      // conserver un rayon circulaire (choisi comme moitié de la plus petite dimension)
+      tReal radius = std::min(wallLength, wallHeight) * 0.5f;
+      wallCenterX = wallXcenter;
+      wallCenterY = wallYcenter;
+      wallRadius = radius;
+      // met à jour aussi les bornes rectangulaires pour compatibilité
+      wallXmin = wallCenterX - wallRadius;
+      wallXmax = wallCenterX + wallRadius;
+      wallYmin = wallCenterY - wallRadius;
+      wallYmax = wallCenterY + wallRadius;
     }
     if(sphere->checkPlaneCollision(Vector3<tReal>(0,0,wallZmax), Vector3<tReal>(0,0,1), penetration, normalContact)) {
-      if(body->X.x > wallXmin && body->X.x < wallXmax && body->X.y > wallYmin && body->X.y < wallYmax) {
+      // collision accepted only if the impact point falls inside the circular paddle
+      tReal dx = body->X.x - wallCenterX;
+      tReal dy = body->X.y - wallCenterY;
+      if(dx*dx + dy*dy <= wallRadius*wallRadius) {
         if(body->V.z < 0) {
           std::cout << "ping" << std::endl;
           Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
@@ -643,17 +672,25 @@ private:
     if(_step==1 && !body->vdata0.empty()) {
       // Point de départ (A) : position actuelle de la balle
       Vector3<tReal> A(body->X.x, body->X.y, body->X.z);
-      std::cout << "Position de service A: (" << A.x << ", " << A.y << ", " << A.z << ")" << std::endl;
       // Choix du côté de service : deux services devant, deux derrière, ...
       int totalPoints = scorePing + scorePong;
-      int group = (totalPoints / 2) % 2; // 0 = front side, 1 = back side
+      int group;
+      // À partir de 10-10 : alternance du service à chaque point (un service chacun)
+      if (scorePing >= 10 && scorePong >= 10) {
+        group = totalPoints % 2; // 0 = front side, 1 = back side, alternate every point
+      } else {
+        // Avant 10-10 : deux services par joueur
+        group = (totalPoints / 2) % 2; // 0 = front side, 1 = back side
+      }
       tReal fondZ = (group == 0) ? tableZmin : tableZmax;
       // Point d'arrivée (B) : cible sur l'autre moitié du terrain (proche du fond)
       tReal targetZ = (group==0) ? fondZ + 0.2f*(abs(fondZ - netZ)) : fondZ - 0.2f*(abs(fondZ - netZ)); // interpole vers le fond depuis le filet
-      tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (tableXmax - tableXmin) + tableXmin; // cible aléatoire en X
+      // cible X limitée à la moitié centrale de la table (entre xmin+1/4*width et xmax-1/4*width)
+      tReal quarter = (tableXmax - tableXmin) * 0.25f;
+      tReal minTargetX = tableXmin + quarter;
+      tReal maxTargetX = tableXmax - quarter;
+      tReal targetX = static_cast<tReal>(rand()) / static_cast<tReal>(RAND_MAX) * (maxTargetX - minTargetX) + minTargetX; // cible aléatoire en X
       Vector3<tReal> B(targetX, tableYmax, targetZ); // cible aléatoire sur le fond
-      std::cout << "Service vers (" << B.x << ", " << B.y << ", " << B.z << ")" << std::endl;
-
       // Compute initial velocity directly from A to B (passage over the net) — no R1
       Vector3<tReal> V0 = Sphere::computeService(A, B);
       body->V = V0;

@@ -167,7 +167,13 @@ struct Scene {
     *rigidAtt = Sphere(0.03f); // sphère de rayon 0.6
     // Choix du côté de service selon le score: deux points devant, deux points derrière, etc.
     int totalPoints = solver.scorePing + solver.scorePong;
-    int group = (totalPoints / 2) % 2; // 0 = front, 1 = back
+    int group;
+    // À partir de 10-10, alternance du service à chaque point; sinon deux services par joueur
+    if (solver.scorePing >= 10 && solver.scorePong >= 10) {
+      group = totalPoints % 2; // alternate every point
+    } else {
+      group = (totalPoints / 2) % 2; // 0 = front, 1 = back (two serves)
+    }
     glm::vec3 startPos = glm::vec3(posInit.x, posInit.y, posInit.z);
     if(group == 0) {
       // devant (côté tableZmax)
@@ -340,6 +346,8 @@ void printHelp()
     "    * S: save a screenshot" << std::endl <<
     "    * W: wireframe rendering" << std::endl <<
     "    * F: surface rendering" << std::endl <<
+    "    * K: toggle manual keyboard wall mode" << std::endl <<
+    "    * L: toggle manual wall mode (force solver)" << std::endl <<
     "    * ESC: quit the program" << std::endl;
 }
 
@@ -378,7 +386,15 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
   } else if(action == GLFW_PRESS && key == GLFW_KEY_K) {
     // bascule le mode manuel clavier pour la raquette
     g_manualKeyboardMode = !g_manualKeyboardMode;
+    // keep solver in sync immediately
+    g_scene.solver.manualWallMode = g_manualKeyboardMode;
     std::cout << "Manual keyboard wall mode: " << (g_manualKeyboardMode ? "ON" : "OFF") << std::endl;
+  } else if(action == GLFW_PRESS && key == GLFW_KEY_L) {
+    // toggle manual wall mode directly in the solver (force)
+    g_scene.solver.manualWallMode = !g_scene.solver.manualWallMode;
+    // keep the global keyboard flag in sync
+    g_manualKeyboardMode = g_scene.solver.manualWallMode;
+    std::cout << "Solver manual wall mode: " << (g_scene.solver.manualWallMode ? "ON" : "OFF") << std::endl;
   } else if(action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
     glfwSetWindowShouldClose(window, true); // Closes the application if the escape key is pressed
   }
@@ -676,6 +692,10 @@ void render()
     g_scene.mainShader->set("wallYmax", wallYmax);
     g_scene.mainShader->set("wallZmin", wallZmin);
     g_scene.mainShader->set("wallZmax", wallZmax);
+    // Nouveaux uniforms pour raquette circulaire
+    g_scene.mainShader->set("wallCenterX", g_scene.solver.wallCenterX);
+    g_scene.mainShader->set("wallCenterY", g_scene.solver.wallCenterY);
+    g_scene.mainShader->set("wallRadius",  g_scene.solver.wallRadius);
 
     // Envoi de l'état gameOver au shader
     g_scene.mainShader->set("gameOver", g_scene.solver.gameOver ? 1 : 0);
