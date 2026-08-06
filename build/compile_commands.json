@@ -1,157 +1,158 @@
 [
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
-  "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/main.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/main.cpp\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/main.cpp"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\c++.exe -IC:/Users/augie/Bureau/projets/projet-final/dep/glad/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glm/.. -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final -O3 -DNDEBUG -std=gnu++11 -o CMakeFiles\\tpProjet.dir\\src\\main.cpp.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\src\\main.cpp",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/src/main.cpp",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/CMakeFiles/tpProjet.dir/src/main.cpp.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
-  "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/RigidSolver.cpp\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/RigidSolver.cpp"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\c++.exe -IC:/Users/augie/Bureau/projets/projet-final/dep/glad/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glm/.. -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final -O3 -DNDEBUG -std=gnu++11 -o CMakeFiles\\tpProjet.dir\\src\\RigidSolver.cpp.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\src\\RigidSolver.cpp",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/src/RigidSolver.cpp",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/CMakeFiles/tpProjet.dir/src/RigidSolver.cpp.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
-  "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/Mesh.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/Mesh.cpp\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/Mesh.cpp"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\c++.exe -IC:/Users/augie/Bureau/projets/projet-final/dep/glad/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glm/.. -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final -O3 -DNDEBUG -std=gnu++11 -o CMakeFiles\\tpProjet.dir\\src\\Mesh.cpp.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\src\\Mesh.cpp",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/src/Mesh.cpp",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/CMakeFiles/tpProjet.dir/src/Mesh.cpp.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
-  "command": "/usr/bin/c++  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\" -std=gnu++11 -o CMakeFiles/tpProjet.dir/src/ShaderProgram.cpp.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/ShaderProgram.cpp\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/src/ShaderProgram.cpp"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\c++.exe -IC:/Users/augie/Bureau/projets/projet-final/dep/glad/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glm/.. -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final -O3 -DNDEBUG -std=gnu++11 -o CMakeFiles\\tpProjet.dir\\src\\ShaderProgram.cpp.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\src\\ShaderProgram.cpp",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/src/ShaderProgram.cpp",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/CMakeFiles/tpProjet.dir/src/ShaderProgram.cpp.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build",
-  "command": "/usr/bin/cc  -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glm/..\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final\"  -o CMakeFiles/tpProjet.dir/dep/glad/src/gl.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/src/gl.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glad/src/gl.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -IC:/Users/augie/Bureau/projets/projet-final/dep/glad/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glm/.. -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final -O3 -DNDEBUG -o CMakeFiles\\tpProjet.dir\\dep\\glad\\src\\gl.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glad\\src\\gl.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glad/src/gl.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/CMakeFiles/tpProjet.dir/dep/glad/src/gl.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/context.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/context.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/context.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\context.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\context.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/context.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/context.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/init.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/init.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/init.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\init.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\init.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/init.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/init.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/input.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/input.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/input.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\input.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\input.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/input.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/input.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/monitor.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/monitor.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/monitor.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\monitor.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\monitor.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/monitor.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/monitor.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/platform.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/platform.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/platform.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\platform.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\platform.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/platform.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/platform.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/vulkan.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/vulkan.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/vulkan.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\vulkan.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\vulkan.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/vulkan.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/vulkan.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/window.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/window.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/window.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\window.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\window.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/window.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/window.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/egl_context.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/egl_context.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/egl_context.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\egl_context.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\egl_context.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/egl_context.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/egl_context.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/osmesa_context.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/osmesa_context.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/osmesa_context.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\osmesa_context.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\osmesa_context.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/osmesa_context.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/osmesa_context.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/null_init.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_init.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_init.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\null_init.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\null_init.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/null_init.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/null_init.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/null_monitor.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_monitor.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_monitor.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\null_monitor.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\null_monitor.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/null_monitor.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/null_window.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_window.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_window.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\null_window.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\null_window.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/null_window.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/null_window.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/null_joystick.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_joystick.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/null_joystick.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\null_joystick.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\null_joystick.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/null_joystick.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/posix_module.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_module.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_module.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_module.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_module.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_module.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_module.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/posix_time.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_time.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_time.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_time.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_time.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_time.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_time.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/posix_thread.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_thread.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_thread.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_thread.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_thread.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_thread.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_thread.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/x11_init.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_init.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_init.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_init.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_init.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_init.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_init.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/x11_monitor.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_monitor.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_monitor.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_joystick.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_joystick.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_joystick.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_joystick.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/x11_window.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_window.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/x11_window.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_monitor.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_monitor.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_monitor.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_monitor.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/xkb_unicode.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/xkb_unicode.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/xkb_unicode.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\win32_window.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\win32_window.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/win32_window.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/win32_window.c.obj"
 },
 {
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/glx_context.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/glx_context.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/glx_context.c"
-},
-{
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/wl_init.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_init.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_init.c"
-},
-{
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/wl_monitor.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_monitor.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_monitor.c"
-},
-{
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/wl_window.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_window.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/wl_window.c"
-},
-{
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/linux_joystick.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/linux_joystick.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/linux_joystick.c"
-},
-{
-  "directory": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src",
-  "command": "/usr/bin/cc -DHAVE_MEMFD_CREATE -D_DEFAULT_SOURCE -D_GLFW_WAYLAND -D_GLFW_X11 -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/include\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src\" -I\"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/build/dep/glfw/src\" -fPIC -Wall -std=c99 -o CMakeFiles/glfw.dir/posix_poll.c.o -c \"/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_poll.c\"",
-  "file": "/cal/exterieurs/eaugier-24/Desktop/IGR03/projet final/dep/glfw/src/posix_poll.c"
+  "directory": "C:/Users/augie/Bureau/projets/projet-final/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe -DUNICODE -DWINVER=0x0501 -D_GLFW_WIN32 -D_UNICODE -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/include -IC:/Users/augie/Bureau/projets/projet-final/dep/glfw/src -IC:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src -O3 -DNDEBUG -std=c99 -Wall -o dep\\glfw\\src\\CMakeFiles\\glfw.dir\\wgl_context.c.obj -c C:\\Users\\augie\\Bureau\\projets\\projet-final\\dep\\glfw\\src\\wgl_context.c",
+  "file": "C:/Users/augie/Bureau/projets/projet-final/dep/glfw/src/wgl_context.c",
+  "output": "C:/Users/augie/Bureau/projets/projet-final/build/dep/glfw/src/CMakeFiles/glfw.dir/wgl_context.c.obj"
 }
 ]

@@ -343,7 +343,7 @@ void printHelp()
     "    * Right button: pan camera" << std::endl <<
     "    Keyboard commands:" << std::endl <<
     "    * H: print this help" << std::endl <<
-    "    * M: changer de mode" << std::endl << // Ajout aide
+    "    * M (ou ; sur AZERTY): changer de mode camera" << std::endl <<
     "    * P: toggle simulation" << std::endl <<
     "    * R: reset simulation" << std::endl <<
     "    * S: save a screenshot" << std::endl <<
@@ -388,9 +388,13 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   } else if(action == GLFW_PRESS && key == GLFW_KEY_F) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  } else if(action == GLFW_PRESS && key == GLFW_KEY_M) {
-    g_cameraFollowsBall = (g_cameraFollowsBall + 1) % 2; // 2 modes, à adapter si besoin
-    std::cout << "Mode changé: " << g_cameraFollowsBall << std::endl;
+  } else if(action == GLFW_PRESS && (key == GLFW_KEY_M || key == GLFW_KEY_SEMICOLON)) {
+    g_cameraFollowsBall = !g_cameraFollowsBall;
+    if (g_cameraFollowsBall) {
+      std::cout << "Camera follow: ON" << std::endl;
+    } else {
+      std::cout << "Camera follow: OFF" << std::endl;
+    }
   } else if(action == GLFW_PRESS && key == GLFW_KEY_K) {
     // bascule le mode manuel clavier pour la raquette
     g_manualKeyboardMode = !g_manualKeyboardMode;
@@ -809,19 +813,6 @@ void update(const float currentTime)
       glm::vec3 camPos = camTarget + glm::vec3(0.0, 1.0, 5.0);
       g_cam->setPosition(camPos);
       glm::vec3 dir = glm::normalize(camTarget - camPos);
-      float yaw   = atan2(dir.x, dir.z);
-      float pitch = asin(-dir.y);
-      g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
-  }
-  else
-  {
-      glm::vec3 target = g_ballInitPos;
-      float camX = target.x + g_camOrbitRadius * cos(g_camOrbitPitch) * sin(g_camOrbitYaw);
-      float camY = 1.5f;
-      float camZ = target.z + g_camOrbitRadius * cos(g_camOrbitPitch) * cos(g_camOrbitYaw);
-      glm::vec3 camPos(camX, camY, camZ);
-      g_cam->setPosition(camPos);
-      glm::vec3 dir = glm::normalize(target - camPos);
       float yaw   = atan2(dir.x, dir.z);
       float pitch = asin(-dir.y);
       g_cam->setRotation(glm::vec3(pitch, yaw, 0.0f));
