@@ -70,9 +70,3 @@ src/       Application, physics, mesh, camera, and shader code
 data/      Textures used by the scene
 dep/       Vendored GLFW, GLM, and GLAD dependencies
 ```
-
-## License and third-party components
-
-Third-party components retain their own licenses; see their files under
-`dep/`. The project source contains a copyright and usage notice in
-`CMakeLists.txt`; consult that notice for the terms applicable to this project.
